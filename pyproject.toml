@@ -13,5 +13,71 @@ dependencies = [
     "drf-spectacular>=0.30.0",
     "gunicorn>=26.2.0",
     "psycopg[binary]>=3.3.5",
-    "pytest-django>=4.14.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9",
+    "pytest-django>=4.14",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+    "django-stubs[compatible-mypy]",
+    "djangorestframework-stubs[compatible-mypy]",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.local"
+testpaths = ["apps"]
+addopts = "-ra --ignore=local_docs"
+
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["**/migrations/**"]
+
+[tool.ruff.lint]
+select =  [
+    "F401", # unused import,
+    "F841",  # assigned but unused variable
+    "F821",  # undefined name
+
+    "RET501",  # unnecessary return None
+    "RET502",  # implicit return None
+    "RET503",  # missing return
+    "RET504",  # unnecessary assignment before return
+
+    "B006", # mutable default argument
+    # "B008",  # function call in default argument
+    "B010",  # setattr/getattr with constant
+    "B020",  # loop variable shadowing
+    "B023",  # function defined inside loop (closure bug)
+
+    "SIM102",  # nested if -> single if
+    "SIM103",  # return condition directly
+    "SIM105",  # try/except/pass → contextlib.suppress,
+
+    "UP035",  # deprecated imports
+
+    "I001",  # unsorted imports
+    "I002",  # missing import grouping
+]
+
+
+[tool.ruff.lint.per-file-ignores]
+"config/settings/*.py" = ["F403", "F405"]
+
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+python_version = "3.12"
+exclude = ["migrations/"]
+
+[[tool.mypy.overrides]]
+module = "environ"
+ignore_missing_imports = true
+
+
+[tool.django-stubs]
+django_settings_module = "config.settings.local"
