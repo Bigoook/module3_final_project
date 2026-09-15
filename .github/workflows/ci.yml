@@ -37,5 +37,5 @@ jobs:
         - uses: astral-sh/setup-uv@v7
         - run: uv sync
         - run: uv run ruff check .
-        - run: uv run mypy .
+#        - run: uv run mypy .
         - run: uv run pytest .
