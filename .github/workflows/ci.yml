@@ -28,7 +28,7 @@ jobs:
           --health-retries 10
 
     env:
-      DJANGO_SETTINGS_MODULE: config.settings.test
+      DJANGO_SETTINGS_MODULE: config.settings.local
       SECRET_KEY: ci-secret
       DATABASE_URL: postgres://shop:shop@localhost:5432/shop
 
