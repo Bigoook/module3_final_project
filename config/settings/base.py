@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import environ
 
@@ -103,4 +104,4 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
-REST_FRAMEWORK = {}
+REST_FRAMEWORK: dict[str, Any] = {}
