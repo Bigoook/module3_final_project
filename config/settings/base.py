@@ -5,12 +5,15 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
-environ.Env.read_env(BASE_DIR / ".env.local")
+environ.Env.read_env(BASE_DIR / '.env.local')
 
 env = environ.Env()
 
-SECRET_KEY = env('SECRET_KEY')
-DEBUG = env("DEBUG")
+# Safe defaults, so the project can run on a clean system without .env.local.
+# Real values must be overridden in production (see prod.py).
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-local-dev-key')
+DEBUG = env.bool('DEBUG', default=False)
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 
 INSTALLED_APPS = [
@@ -20,11 +23,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
     'django_filters',
     'drf_spectacular',
-
     # apps
     'apps.accounts',
     'apps.api',
@@ -32,7 +33,6 @@ INSTALLED_APPS = [
     'apps.orders',
     'apps.payments',
     'apps.reviews',
-
 ]
 
 MIDDLEWARE = [
@@ -50,7 +50,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ BASE_DIR /  "templates"],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -62,11 +62,20 @@ TEMPLATES = [
     },
 ]
 
-DATABASES = {'default': env.db("DATABASE_URL")}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+if DATABASE_URL := env('DATABASE_URL', default=None):
+    DATABASES = {'default': env.db('DATABASE_URL')}
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-AUTH_USER_MODEL="accounts.User"
+AUTH_USER_MODEL = 'accounts.User'
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -87,11 +96,11 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 REST_FRAMEWORK = {}

@@ -30,12 +30,14 @@ jobs:
     env:
       DJANGO_SETTINGS_MODULE: config.settings.local
       SECRET_KEY: ci-secret
-      DATABASE_URL: postgres://shop:shop@localhost:5432/shop
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/final3
 
     steps:
-        - uses: actions/checkout@v7
-        - uses: astral-sh/setup-uv@v7
-        - run: uv sync
-        - run: uv run ruff check .
-#        - run: uv run mypy .
-        - run: uv run pytest .
+        - uses: actions/checkout@v4
+        - uses: actions/setup-python@v5
+          with:
+            python-version: "3.12"
+        - run: pip install -r requirements-dev.txt
+        - run: ruff check .
+#        - run: mypy .
+        - run: pytest .

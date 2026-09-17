@@ -1,31 +1,3 @@
-[project]
-name = "module3-final-project"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "django>=6.1.1",
-    "django-environ>=0.14.0",
-    "django-filter>=26.1",
-    "djangorestframework>=3.18.1",
-    "djangorestframework-simplejwt>=5.5.1",
-    "drf-spectacular>=0.30.0",
-    "gunicorn>=26.2.0",
-    "psycopg[binary]>=3.3.5",
-]
-
-[dependency-groups]
-dev = [
-    "pytest>=9",
-    "pytest-django>=4.14",
-    "pytest-cov",
-    "ruff",
-    "mypy",
-    "django-stubs[compatible-mypy]",
-    "djangorestframework-stubs[compatible-mypy]",
-]
-
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.local"
 testpaths = ["apps"]
@@ -33,40 +5,157 @@ addopts = "-ra --ignore=local_docs"
 
 
 [tool.ruff]
-line-length = 100
 target-version = "py312"
-extend-exclude = ["**/migrations/**"]
+line-length = 120
+
+extend-exclude = [
+    "**/migrations/**",
+    "local_docs",
+    "**/static/**",
+]
+
 
 [tool.ruff.lint]
-select =  [
-    "F401", # unused import,
-    "F841",  # assigned but unused variable
-    "F821",  # undefined name
+preview = true
 
-    "RET501",  # unnecessary return None
-    "RET502",  # implicit return None
-    "RET503",  # missing return
-    "RET504",  # unnecessary assignment before return
+select = [
+    "BLE",  # flake8-blind-except
+    "C",  # flake8-comprehensions
+    "COM",  # flake8-commas
+    "E",  # pycodestyle Error
+    "EM",  # flake8-errmsg
+    "EXE",  # flake8-executable
+    "F",  # Pyflakes
+    "FA",  # flake8-future-annotations
+    "FLY",  # flynt
+    "G",  # flake8-logging-format
+    "I",  # isort
+    "ICN",  # flake8-import-conventions
+    "INT",  # flake8-gettext
+    "ISC",  # flake8-implicit-str-concat
+    "LOG",  # flake8-logging
+    "PGH",  # pygrep-hooks
+    "PIE",  # flake8-pie
+    "PLC",  # Pylint Convention
+    "PLE",  # Pylint Error
+    "PLW",  # Pylint Warning
+    "PYI",  # flake8-pyi
+    "RET",  # flake8-return
+    "RUF",  # Ruff-specific rules
+    "S",  # flake8-bandit (security)
+    "SIM",  # flake8-simplify
+    "SLOT",  # flake8-slots
+    "T",  # flake8-print
+    "TC",  # flake8-type-checking
+    "TID",  # flake8-tidy-imports
+    "TRY",  # tryceratops
+    "UP",  # pyupgrade
+    "W",  # pycodestyle Warning
+    "YTT",  # flake8-2020
+]
 
-    "B006", # mutable default argument
-    # "B008",  # function call in default argument
-    "B010",  # setattr/getattr with constant
-    "B020",  # loop variable shadowing
-    "B023",  # function defined inside loop (closure bug)
+ignore = [
+    # ---- Pragmatic ignores (community compatibility) ----
+    "unnecessary-collection-call",  # unnecessary-collection-call
+    "unnecessary-dict-comprehension-for-iterable",  # unnecessary-dict-comprehension-for-iterable
+    "complex-structure",  # complex-structure (views/forms are complex by nature)
+    "multiple-leading-hashes-for-block-comment",  # multiple-leading-hashes-for-block-comment
+    "blank-lines-top-level",  # expected 2 blank lines (import * / settings files)
+    "line-too-long",  # line-too-long (handled via line-length above)
+    "not-in-test",  # not-in-test
+    "f-string-in-exception",  # f-string-in-exception
+    "future-rewritable-type-annotation",  # future-rewritable-type-annotation
+    "blanket-type-ignore",  # blanket-type-ignore
+    "unnecessary-placeholder",  # unnecessary-placeholder
+    "unnecessary-range-start",  # unnecessary-range-start
+    "import-private-name",  # import-private-name
+    "redefined-loop-name",  # redefined-loop-name
+    "ambiguous-unicode-character-string",  # ambiguous-unicode-character-string (Ukrainian/i18n text)
+    "collection-literal-concatenation",  # collection-literal-concatenation
+    "unused-noqa",  # unused-noqa
+    "collapsible-if",  # collapsible-if (nested template/view conditions are fine)
+    "if-else-block-instead-of-if-exp",  # if-else-block-instead-of-if-exp
+    "multiple-with-statements",  # multiple-with-statements
+    "raise-vanilla-args",  # raise-vanilla-args
+    "try-consider-else",  # try-consider-else
+    "raise-within-try",  # raise-within-try
+    "error-instead-of-exception",  # error-instead-of-exception
+    "printf-string-formatting",  # printf-string-formatting
 
-    "SIM102",  # nested if -> single if
-    "SIM103",  # return condition directly
-    "SIM105",  # try/except/pass → contextlib.suppress,
+    # ---- Formatter-friendly (deferred to ruff format) ----
+    "missing-trailing-comma",  # trailing-comma-missing
+    "single-line-implicit-string-concatenation",  # single-line implicit string concat
 
-    "UP035",  # deprecated imports
+    # ---- Django development patterns ----
+    "raw-string-in-exception",  # plain string in raise — forms raise ValidationError('msg')
+    "logging-exc-info",  # logging.exception inside except — common pattern
+    "assert",  # assert — fine in tests and some validators
+    "private-member-access",  # private member access — Django uses _meta, _default_manager
+    "relative-imports",  # relative-imports — Django apps sometimes use package-relative
 
-    "I001",  # unsorted imports
-    "I002",  # missing import grouping
+    # ---- Typing: keep loose at this stage ----
+    "non-pep585-annotation",  # use-pep585-annotation (list vs List)
+    "non-pep604-annotation-union",  # use-pep604-annotation (X | Y vs Optional[X])
+    "deprecated-import",  # deprecated-import (typing module)
 ]
 
 
 [tool.ruff.lint.per-file-ignores]
-"config/settings/*.py" = ["F403", "F405"]
+"manage.py" = [
+    "import-outside-top-level",  # Django scaffold: `import` inside try/except ImportError
+]
+"config/settings/*.py" = [
+    "undefined-local-with-import-star",  # star-import (base settings via `from .base import *`)
+    "undefined-local-with-import-star-usage",  # undefined-name-from-star (names from star-import)
+]
+"**/__init__.py" = [
+    "unused-import",  # re-exports
+    "unsorted-imports",  # import-sorting (re-export order is intentional)
+]
+# Tests: everything that makes test writing painful
+"**/tests/**/*.py" = [
+    "assert",  # assert
+    "hardcoded-password-string",  # hardcoded password in test fixtures
+    "hardcoded-password-func-arg",  # hardcoded password argument
+    "try-except-pass",  # try/except/pass
+    "print",  # print statements (debugging)
+    "magic-value-comparison",  # magic values in comparisons (assertEqual(result, 42))
+    "unused-variable",  # unused variable (common in test setup)
+    "blind-except",  # blind-except
+    "raw-string-in-exception",  # plain string in exception
+    "import-outside-top-level",  # conditional imports in test helpers
+    "suppressible-exception",  # suppressible-exception (contextlib.suppress vs try/except/pass)
+]
+"**/tests.py" = [
+    "assert",  # assert
+    "hardcoded-password-string",  # hardcoded password in test fixtures
+    "hardcoded-password-func-arg",  # hardcoded password argument
+    "try-except-pass",  # try/except/pass
+    "print",  # print statements (debugging)
+    "magic-value-comparison",  # magic values in comparisons
+    "unused-variable",  # unused variable (common in test setup)
+    "blind-except",  # blind-except
+    "raw-string-in-exception",  # plain string in exception
+    "import-outside-top-level",  # conditional imports in test helpers
+    "suppressible-exception",  # suppressible-exception
+]
+
+
+[tool.ruff.lint.isort]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+known-first-party = ["config", "apps"]
+
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+docstring-code-format = true
 
 
 [tool.mypy]
