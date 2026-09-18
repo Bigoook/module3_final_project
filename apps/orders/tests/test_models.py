@@ -128,3 +128,22 @@ def test_order_number_increments_and_is_not_reused() -> None:
     third = Order.objects.create(user=user, total_price=Decimal('0'))
 
     assert third.order_number == 3
+
+
+@pytest.mark.django_db
+def test_order_number_not_overwritten_on_resave() -> None:
+    user = get_user_model().objects.create(username='buyer')
+    order = Order.objects.create(user=user, total_price=Decimal('0'))
+
+    order.save()
+
+    assert order.order_number == 1
+
+
+@pytest.mark.django_db
+def test_order_number_must_be_unique() -> None:
+    user = get_user_model().objects.create(username='buyer')
+    Order.objects.create(user=user, total_price=Decimal('0'))
+
+    with pytest.raises(IntegrityError):
+        Order.objects.create(user=user, total_price=Decimal('0'), order_number=1)
