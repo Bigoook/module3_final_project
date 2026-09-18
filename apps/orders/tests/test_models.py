@@ -112,3 +112,19 @@ def test_order_negative_total_price_enforced_at_db_level() -> None:
 
     with pytest.raises(IntegrityError):
         Order.objects.create(user=user, total_price=Decimal('-5.00'))
+
+
+@pytest.mark.django_db
+def test_order_number_increments_and_is_not_reused() -> None:
+    user = get_user_model().objects.create(username='buyer')
+    first = Order.objects.create(user=user, total_price=Decimal('0'))
+    second = Order.objects.create(user=user, total_price=Decimal('0'))
+
+    assert first.order_number == 1
+    assert second.order_number == 2
+    assert str(first) == 'Order #1'
+
+    second.delete()
+    third = Order.objects.create(user=user, total_price=Decimal('0'))
+
+    assert third.order_number == 3
