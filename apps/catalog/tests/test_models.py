@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 import pytest
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models.deletion import ProtectedError
 
@@ -48,6 +49,35 @@ def test_product_stores_decimal_price_and_positive_stock() -> None:
     assert product.stock == 7
     assert product.is_active is True
     assert str(product) == 'Headphones'
+
+
+@pytest.mark.django_db
+def test_product_price_validator_rejects_zero() -> None:
+    category = Category.objects.create(name='Shop', slug='shop')
+    product = Product(
+        name='Headphones',
+        slug='headphones',
+        description='',
+        price=Decimal('0'),
+        category=category,
+    )
+
+    with pytest.raises(ValidationError):
+        product.full_clean()
+
+
+@pytest.mark.django_db
+def test_product_negative_price_enforced_at_db_level() -> None:
+    category = Category.objects.create(name='Shop', slug='shop')
+
+    with pytest.raises(IntegrityError):
+        Product.objects.create(
+            name='Headphones',
+            slug='headphones',
+            description='',
+            price=Decimal('-1.00'),
+            category=category,
+        )
 
 
 @pytest.mark.django_db

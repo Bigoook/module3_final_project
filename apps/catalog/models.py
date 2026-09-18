@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -29,7 +32,12 @@ class Product(models.Model):
     name = models.CharField(_('name'), max_length=200)
     slug = models.SlugField(_('slug'), max_length=250, unique=True)
     description = models.TextField(_('description'))
-    price = models.DecimalField(_('price'), max_digits=10, decimal_places=2)
+    price = models.DecimalField(
+        _('price'),
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+    )
     category = models.ForeignKey(
         Category,
         verbose_name=_('category'),
@@ -46,6 +54,12 @@ class Product(models.Model):
         ordering = ('name',)
         verbose_name = _('product')
         verbose_name_plural = _('products')
+        constraints = (
+            models.CheckConstraint(
+                condition=models.Q(price__gt=0),
+                name='product_price_positive',
+            ),
+        )
 
     def __str__(self) -> str:
         return self.name

@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -30,6 +31,7 @@ class Order(models.Model):
         max_digits=10,
         decimal_places=2,
         default=0,
+        validators=[MinValueValidator(Decimal('0'))],
     )
     shipping_address = models.TextField(_('shipping address'), blank=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -39,6 +41,12 @@ class Order(models.Model):
         ordering = ('-created_at',)
         verbose_name = _('order')
         verbose_name_plural = _('orders')
+        constraints = (
+            models.CheckConstraint(
+                condition=models.Q(total_price__gte=0),
+                name='order_total_non_negative',
+            ),
+        )
 
     def __str__(self) -> str:
         return f'Order #{self.pk}'
@@ -58,13 +66,22 @@ class OrderItem(models.Model):
         related_name='order_items',
     )
     quantity = models.PositiveIntegerField(_('quantity'))
-    price = models.DecimalField(_('price'), max_digits=10, decimal_places=2)
+    price = models.DecimalField(
+        _('price'),
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+    )
 
     class Meta:
         constraints = (
             models.UniqueConstraint(
                 fields=['order', 'product'],
                 name='unique_order_product',
+            ),
+            models.CheckConstraint(
+                condition=models.Q(price__gt=0),
+                name='item_price_positive',
             ),
         )
         ordering = ('pk',)
