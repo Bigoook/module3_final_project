@@ -55,7 +55,7 @@ class OrderItem(models.Model):
         'catalog.Product',
         verbose_name=_('product'),
         on_delete=models.PROTECT,
-        related_name='items',
+        related_name='order_items',
     )
     quantity = models.PositiveIntegerField(_('quantity'))
     price = models.DecimalField(_('price'), max_digits=10, decimal_places=2)
