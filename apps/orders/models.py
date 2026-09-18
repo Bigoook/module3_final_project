@@ -40,3 +40,34 @@ class Order(models.Model):
 
     def __str__(self) -> str:
         return f'Order #{self.pk}'
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order,
+        verbose_name=_('order'),
+        on_delete=models.CASCADE,
+        related_name='items',
+    )
+    product = models.ForeignKey(
+        'catalog.Product',
+        verbose_name=_('product'),
+        on_delete=models.PROTECT,
+        related_name='items',
+    )
+    quantity = models.PositiveIntegerField(_('quantity'))
+    price = models.DecimalField(_('price'), max_digits=10, decimal_places=2)
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                fields=['order', 'product'],
+                name='unique_order_product',
+            ),
+        )
+        ordering = ('pk',)
+        verbose_name = _('item')
+        verbose_name_plural = _('items')
+
+    def __str__(self) -> str:
+        return f'{self.order_id} / {self.product}'
