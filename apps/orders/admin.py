@@ -11,11 +11,11 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'status', 'total_price', 'created_at')
+    list_display = ('id', 'order_number', 'user', 'status', 'total_price', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('user__username', 'user__email', 'shipping_address')
     list_select_related = ('user',)
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('order_number', 'created_at', 'updated_at')
     inlines = (OrderItemInline,)
 
 
