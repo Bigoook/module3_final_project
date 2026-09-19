@@ -52,7 +52,7 @@ class Order(TimeStampedModel):
         decimal_places=2,
         default=0,
         validators=[MinValueValidator(Decimal('0'))],
-)
+    )
     shipping_address = models.TextField(_('shipping address'), blank=True)
 
     class Meta:
