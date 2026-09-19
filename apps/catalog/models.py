@@ -4,8 +4,10 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from apps.core.models import TimeStampedModel
 
-class Category(models.Model):
+
+class Category(TimeStampedModel):
     name = models.CharField(_('name'), max_length=150)
     slug = models.SlugField(_('slug'), max_length=200, unique=True)
     parent = models.ForeignKey(
@@ -16,8 +18,6 @@ class Category(models.Model):
         blank=True,
         related_name='children',
     )
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
     class Meta:
         ordering = ('name',)
@@ -28,7 +28,7 @@ class Category(models.Model):
         return self.name
 
 
-class Product(models.Model):
+class Product(TimeStampedModel):
     name = models.CharField(_('name'), max_length=200)
     slug = models.SlugField(_('slug'), max_length=250, unique=True)
     description = models.TextField(_('description'))
@@ -47,8 +47,6 @@ class Product(models.Model):
     image = models.ImageField(_('image'), upload_to='products/', blank=True)
     is_active = models.BooleanField(_('is active'), default=True)
     stock = models.IntegerField(_('stock'), default=0)
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
     class Meta:
         ordering = ('name',)

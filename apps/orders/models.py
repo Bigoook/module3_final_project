@@ -6,6 +6,8 @@ from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
+from apps.core.models import TimeStampedModel
+
 
 class OrderNumber(models.Model):
     last = models.PositiveBigIntegerField(default=0)
@@ -23,7 +25,7 @@ class OrderNumber(models.Model):
             return counter.last
 
 
-class Order(models.Model):
+class Order(TimeStampedModel):
     class Status(models.TextChoices):
         PENDING = 'pending', _('pending')
         PAID = 'paid', _('paid')
@@ -50,10 +52,8 @@ class Order(models.Model):
         decimal_places=2,
         default=0,
         validators=[MinValueValidator(Decimal('0'))],
-    )
+)
     shipping_address = models.TextField(_('shipping address'), blank=True)
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
     class Meta:
         ordering = ('-created_at',)

@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'apps.accounts',
     'apps.api',
     'apps.catalog',
+    'apps.core',
     'apps.orders',
     'apps.payments',
     'apps.reviews',
