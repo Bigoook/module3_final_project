@@ -62,6 +62,9 @@ db.sqlite3
 db.sqlite3-journal
 media/
 
+# Local assistant rules
+AGENTS.md
+
 # Flask stuff:
 instance/
 .webassets-cache
