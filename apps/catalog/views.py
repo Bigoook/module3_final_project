@@ -1,6 +1,7 @@
-from django.http import Http404, HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.http import Http404
+from django.views.generic import DetailView, ListView, TemplateView
 
+from apps.catalog.models import Product
 from apps.catalog.selectors import (
     get_featured_products,
     get_product_detail_by_slug,
@@ -8,18 +9,40 @@ from apps.catalog.selectors import (
 )
 
 
-def home(request: HttpRequest) -> HttpResponse:
-    featured_products = get_featured_products()
-    return render(request, 'catalog/home.html', {'featured_products': featured_products})
+class HomeView(TemplateView):
+    template_name = 'catalog/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['featured_products'] = get_featured_products()
+        return context
 
 
-def product_list(request: HttpRequest, category_slug: str | None = None) -> HttpResponse:
-    products = get_product_listing(category_slug=category_slug)
-    return render(request, 'catalog/product_list.html', {'products': products})
+class ProductListView(ListView):
+    model = Product
+    template_name = 'catalog/product_list.html'
+    context_object_name = 'products'
+    paginate_by = 12
+
+    def get_queryset(self):
+        category_slug = self.kwargs.get('category_slug')
+        ordering = self.request.GET.get('ordering', '-created_at')
+        return get_product_listing(category_slug=category_slug, ordering=ordering)
 
 
-def product_detail(request: HttpRequest, slug: str) -> HttpResponse:
-    product = get_product_detail_by_slug(slug)
-    if product is None:
-        raise Http404
-    return render(request, 'catalog/product_detail.html', {'product': product})
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'catalog/product_detail.html'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def get_object(self, queryset=None) -> Product:
+        product = get_product_detail_by_slug(self.kwargs['slug'])
+        if product is None:
+            raise Http404('Product not found')
+        return product
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['reviews'] = list(self.object.reviews.all())
+        return context
