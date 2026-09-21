@@ -99,6 +99,39 @@ def test_listing_applies_ordering() -> None:
 
 
 @pytest.mark.django_db
+def test_listing_orders_by_rating_annotation() -> None:
+    _, products = _make_products('Alpha', 'Beta')
+    user = get_user_model().objects.create_user(username='reviewer')
+
+    Review.objects.create(product=products[0], user=user, rating=5, comment='top')
+    Review.objects.create(
+        product=products[1],
+        user=get_user_model().objects.create_user(username='reviewer2'),
+        rating=1,
+        comment='bad',
+    )
+    Review.objects.create(
+        product=products[1],
+        user=get_user_model().objects.create_user(username='reviewer3'),
+        rating=5,
+        comment='ok',
+    )
+
+    listed = list(get_product_listing(ordering='-rating'))
+
+    assert listed[0].pk == products[0].pk
+
+
+@pytest.mark.django_db
+def test_listing_ignores_unknown_ordering() -> None:
+    _, products = _make_products('Alpha', 'Beta')
+
+    listed = list(get_product_listing(ordering='rating; DROP TABLE product'))
+
+    assert set(listed) == set(products)
+
+
+@pytest.mark.django_db
 def test_listing_excludes_inactive() -> None:
     category = Category.objects.create(name='Shop', slug='shop')
     Product.objects.create(

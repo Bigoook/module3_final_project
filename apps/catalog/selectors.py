@@ -4,6 +4,15 @@ from django.db.models import QuerySet
 
 from apps.catalog.models import Product
 
+ORDERING_CHOICES = {
+    'name': 'name',
+    '-name': '-name',
+    'price': 'price',
+    '-price': '-price',
+    '-rating': '-_rating_avg',
+    '-created_at': '-created_at',
+}
+
 
 def get_featured_products(limit: int = 6) -> QuerySet[Product]:
     """Active products with the highest average rating, newest first."""
@@ -19,7 +28,7 @@ def get_product_listing(
     queryset = Product.objects.for_listing()
     if category_slug:
         queryset = queryset.filter(category__slug=category_slug)
-    return queryset.order_by(ordering)
+    return queryset.order_by(ORDERING_CHOICES.get(ordering, '-created_at'))
 
 
 def get_product_detail(product_id: int) -> Product | None:
