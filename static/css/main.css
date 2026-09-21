@@ -2545,3 +2545,13 @@ body.user-logged-in .header__user-actions {
 .header__nav .header__nav-dropdown:focus-within .header__nav-dropdown-menu {
     display: block;
 }
+
+.header__nav .header__nav-dropdown-menu .header__nav-dropdown-child a {
+    padding-left: 24px;
+}
+
+.header__nav .header__nav-dropdown-menu li a:hover {
+    background-color: var(--green);
+    color: var(--white-text);
+    border-radius: 4px;
+}
