@@ -1,6 +1,7 @@
 from django.http import Http404
 from django.views.generic import DetailView, ListView, TemplateView
 
+from apps.catalog.filters import ProductFilter
 from apps.catalog.models import Product
 from apps.catalog.selectors import (
     get_featured_products,
@@ -27,7 +28,14 @@ class ProductListView(ListView):
     def get_queryset(self):
         category_slug = self.kwargs.get('category_slug')
         ordering = self.request.GET.get('ordering', '-created_at')
-        return get_product_listing(category_slug=category_slug, ordering=ordering)
+        queryset = get_product_listing(category_slug=category_slug, ordering=ordering)
+        self.filterset = ProductFilter(self.request.GET, queryset=queryset)
+        return self.filterset.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = self.filterset
+        return context
 
 
 class ProductDetailView(DetailView):

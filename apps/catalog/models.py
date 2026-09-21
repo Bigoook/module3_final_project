@@ -33,6 +33,14 @@ class Category(TimeStampedModel):
     def get_absolute_url(self) -> str:
         return reverse('catalog:product_list', kwargs={'category_slug': self.slug})
 
+    def get_descendants(self) -> list['Category']:
+        """All nested child categories, excluding self."""
+        descendants = []
+        for child in self.children.all():
+            descendants.append(child)
+            descendants.extend(child.get_descendants())
+        return descendants
+
 
 class ProductManager(models.Manager['Product']):
     """Query API for active products annotated with review ratings."""

@@ -2,7 +2,7 @@
 
 from django.db.models import QuerySet
 
-from apps.catalog.models import Product
+from apps.catalog.models import Category, Product
 
 ORDERING_CHOICES = {
     'name': 'name',
@@ -24,10 +24,13 @@ def get_product_listing(
     category_slug: str | None = None,
     ordering: str = '-created_at',
 ) -> QuerySet[Product]:
-    """Active products filtered by optional category and ordered."""
+    """Active products filtered by optional category (with descendants) and ordered."""
     queryset = Product.objects.for_listing()
     if category_slug:
-        queryset = queryset.filter(category__slug=category_slug)
+        category = Category.objects.filter(slug=category_slug).first()
+        if category is None:
+            return queryset.none()
+        queryset = queryset.filter(category__in=[category, *category.get_descendants()])
     return queryset.order_by(ORDERING_CHOICES.get(ordering, '-created_at'))
 
 

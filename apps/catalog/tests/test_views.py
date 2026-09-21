@@ -13,11 +13,12 @@ def _make_category(name: str = 'Shop', slug: str = 'shop') -> Category:
 
 
 def _make_product(name: str, category: Category, **kwargs):
+    price = kwargs.pop('price', Decimal('9.99'))
     return Product.objects.create(
         name=name,
         slug=name.replace(' ', '-').lower(),
         description='description',
-        price=Decimal('9.99'),
+        price=price,
         category=category,
         **kwargs,
     )
@@ -32,6 +33,18 @@ def test_home_renders_featured_products() -> None:
 
     assert response.status_code == 200
     assert product.name.encode() in response.content
+
+
+@pytest.mark.django_db
+def test_home_header_lists_child_categories() -> None:
+    parent = _make_category('Malts', 'malts')
+    Category.objects.create(name='Base Malts', slug='base-malts', parent=parent)
+
+    response = Client().get('/')
+
+    assert response.status_code == 200
+    assert b'Malts' in response.content
+    assert b'Base Malts' in response.content
 
 
 @pytest.mark.django_db
@@ -65,6 +78,22 @@ def test_product_list_respects_ordering_and_category() -> None:
 
     assert category_response.status_code == 200
     assert len(category_response.context['products']) == 2
+
+
+@pytest.mark.django_db
+def test_product_list_filters_via_sidebar_params() -> None:
+    malts = _make_category('Malts', 'malts')
+    _make_product('Citra Hops', _make_category('Hops', 'hops'))
+    _make_product('A Malt', malts, price=Decimal('1.00'), stock=0)
+    _make_product('B Malt', malts, price=Decimal('15.00'), stock=5)
+
+    filtered = Client().get(
+        '/products/?category=malts&search=malt&min_price=10&in_stock=true'
+    )
+
+    assert filtered.status_code == 200
+    assert [p.slug for p in filtered.context['products']] == ['b-malt']
+    assert [p.slug for p in filtered.context['filter'].qs] == ['b-malt']
 
 
 @pytest.mark.django_db

@@ -3,6 +3,7 @@ from decimal import Decimal
 import pytest
 from django.contrib.auth import get_user_model
 
+from apps.catalog.filters import ProductFilter
 from apps.catalog.models import Category, Product
 from apps.catalog.selectors import (
     get_featured_products,
@@ -87,6 +88,28 @@ def test_listing_filters_by_category_and_orders() -> None:
     listed = list(get_product_listing(category_slug='malts'))
 
     assert listed == [first]
+
+
+@pytest.mark.django_db
+def test_listing_parent_category_includes_descendants() -> None:
+    parent = Category.objects.create(name='Malts', slug='malts')
+    child = Category.objects.create(name='Base Malts', slug='base-malts', parent=parent)
+    product = Product.objects.create(
+        name='Pale',
+        slug='pale',
+        description='',
+        price=Decimal('1.00'),
+        category=child,
+    )
+
+    listed = list(get_product_listing(category_slug='malts'))
+
+    assert listed == [product]
+
+
+@pytest.mark.django_db
+def test_listing_unknown_category_returns_empty() -> None:
+    assert list(get_product_listing(category_slug='missing')) == []
 
 
 @pytest.mark.django_db
@@ -209,3 +232,105 @@ def test_related_products_exclude_self_and_other_categories() -> None:
 
     assert same.pk in [p.pk for p in related]
     assert other.pk not in [p.pk for p in related]
+
+
+@pytest.mark.django_db
+def test_filter_searches_name_and_description() -> None:
+    category = Category.objects.create(name='Shop', slug='shop')
+    Product.objects.create(
+        name='Centennial',
+        slug='centennial',
+        description='US aroma hops',
+        price=Decimal('1.00'),
+        category=category,
+    )
+    Product.objects.create(
+        name='Pale malt',
+        slug='pale-malt',
+        description='Crisp base grain',
+        price=Decimal('1.00'),
+        category=category,
+    )
+
+    found = ProductFilter(
+        {'search': 'hops'}, queryset=Product.objects.for_listing()
+    ).qs
+
+    assert {p.slug for p in found} == {'centennial'}
+
+
+@pytest.mark.django_db
+def test_filter_price_range_and_in_stock() -> None:
+    category = Category.objects.create(name='Shop', slug='shop')
+    Product.objects.create(
+        name='Cheap',
+        slug='cheap',
+        description='',
+        price=Decimal('5.00'),
+        category=category,
+        stock=0,
+    )
+    Product.objects.create(
+        name='Mid',
+        slug='mid',
+        description='',
+        price=Decimal('15.00'),
+        category=category,
+        stock=4,
+    )
+    Product.objects.create(
+        name='Pricey',
+        slug='pricey',
+        description='',
+        price=Decimal('25.00'),
+        category=category,
+        stock=9,
+    )
+
+    found = ProductFilter(
+        {
+            'min_price': '10',
+            'max_price': '20',
+            'in_stock': 'true',
+        },
+        queryset=Product.objects.for_listing(),
+    ).qs
+
+    assert {p.slug for p in found} == {'mid'}
+
+
+@pytest.mark.django_db
+def test_filter_category_param_includes_children() -> None:
+    parent = Category.objects.create(name='Malts', slug='malts')
+    child = Category.objects.create(name='Base Malts', slug='base-malts', parent=parent)
+    product = Product.objects.create(
+        name='Pale',
+        slug='pale',
+        description='',
+        price=Decimal('1.00'),
+        category=child,
+    )
+
+    found = ProductFilter(
+        {'category': 'malts'}, queryset=Product.objects.for_listing()
+    ).qs
+
+    assert list(found) == [product]
+
+
+@pytest.mark.django_db
+def test_filter_unknown_category_is_empty() -> None:
+    category = Category.objects.create(name='Shop', slug='shop')
+    Product.objects.create(
+        name='Pale',
+        slug='pale',
+        description='',
+        price=Decimal('1.00'),
+        category=category,
+    )
+
+    found = ProductFilter(
+        {'category': 'missing'}, queryset=Product.objects.for_listing()
+    ).qs
+
+    assert list(found) == []
