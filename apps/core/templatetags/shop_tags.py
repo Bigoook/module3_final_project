@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 from django import template
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -13,7 +14,7 @@ def money(value) -> str:
     return f'${Decimal(value):.2f}'
 
 
-@register.simple_tag(is_safe=True)  # type: ignore[call-overload]
+@register.simple_tag
 def stars(value) -> str:
     """Render a 5-star rating row (full / half / empty FontAwesome 6 icons)."""
     try:
@@ -32,4 +33,4 @@ def stars(value) -> str:
             icons.append('<i class="fa-solid fa-star-half-stroke"></i>')
         else:
             icons.append('<i class="fa-regular fa-star"></i>')
-    return ''.join(icons)
+    return mark_safe(''.join(icons))  # ruff: ignore[suspicious-mark-safe-usage]
