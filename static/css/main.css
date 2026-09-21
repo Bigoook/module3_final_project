@@ -137,6 +137,7 @@ header {
     background-color: var(--border-default);
     border: 1px solid var(--border-dark-grey);
     color: var(--black-main);
+    flex: 0 0 auto;
 }
 
 .button--secondary:hover {
@@ -2370,16 +2371,18 @@ body.user-logged-in .header__user-actions {
 }
 
 .category-tile {
-    padding: 24px;
-    background-color: var(--background-default);
-    border: 1px solid var(--border-default);
+    padding: 12px 24px;
+    background-color: var(--green);
+    border: 1px solid var(--green);
     border-radius: 8px;
     text-align: center;
     font-weight: 600;
+    color: var(--white-text);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .category-tile:hover {
+    background-color: #036b3a;
     transform: translateY(-3px);
     box-shadow: 0 5px 15px var(--black-100);
 }
@@ -2529,4 +2532,16 @@ body.user-logged-in .header__user-actions {
 
 .messages-container {
     padding-top: 16px;
+}
+
+.header__nav .header__nav-dropdown-menu {
+    display: none;
+    width: auto;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.header__nav .header__nav-dropdown:hover .header__nav-dropdown-menu,
+.header__nav .header__nav-dropdown:focus-within .header__nav-dropdown-menu {
+    display: block;
 }
