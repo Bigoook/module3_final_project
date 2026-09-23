@@ -809,23 +809,13 @@ footer {
 
 /*
 ========================================
-    Logic for Hiding/Showing Auth Blocks
+    Auth blocks visibility is handled by
+    server-rendered {% if user.is_authenticated %}
+    in partials/header.html (see the
+    override below); the old body.user-logged-in
+    toggle no longer exists.
 ========================================
 */
-
-body:not(.user-logged-in) .header__user-actions {
-    display: none;
-}
-body:not(.user-logged-in) .header__auth-buttons {
-    display: flex;
-}
-
-body.user-logged-in .header__auth-buttons {
-    display: none;
-}
-body.user-logged-in .header__user-actions {
-    display: flex;
-}
 
 
 /*
