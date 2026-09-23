@@ -1206,6 +1206,12 @@ footer {
     align-items: center;
 }
 
+.cart-item__quantity-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .cart-item__quantity-selector {
     width: 102px;
     height: 40px;
