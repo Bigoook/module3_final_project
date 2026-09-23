@@ -4,24 +4,34 @@ import pytest
 from django.contrib.auth import get_user_model
 
 from apps.catalog.models import Category, Product
+from apps.orders.cart import Cart
 from apps.orders.services import (
+    CartStatus,
+    add_product_to_cart,
     create_order,
     recalculate_total,
+    remove_from_cart,
     remove_item,
+    update_cart_quantity,
     update_item_quantity,
 )
+
+
+class _FakeSession(dict):
+    modified = False
 
 
 def _make_category() -> Category:
     return Category.objects.create(name='Shop', slug='shop')
 
 
-def _make_product(category: Category, name: str, price: str) -> Product:
+def _make_product(category: Category, name: str, price: str, stock: int = 10) -> Product:
     return Product.objects.create(
         name=name,
         description='',
         price=Decimal(price),
         category=category,
+        stock=stock,
     )
 
 
@@ -106,3 +116,99 @@ def test_order_reuses_order_number_counter() -> None:
 
     assert first.order_number
     assert second.order_number == first.order_number + 1
+
+
+@pytest.mark.django_db
+def test_add_product_to_cart_returns_added() -> None:
+    cart = Cart(_FakeSession())
+    product = _make_product(_make_category(), 'Alpha', '10.00', stock=5)
+
+    result = add_product_to_cart(cart, product, 3)
+
+    assert result.status == CartStatus.ADDED
+    assert result.quantity == 3
+    assert cart.get_quantity(product.pk) == 3
+
+
+@pytest.mark.django_db
+def test_add_product_to_cart_caps_at_stock() -> None:
+    cart = Cart(_FakeSession())
+    product = _make_product(_make_category(), 'Alpha', '10.00', stock=2)
+
+    result = add_product_to_cart(cart, product, 5)
+
+    assert result.status == CartStatus.CAPPED
+    assert result.quantity == 2
+    assert cart.get_quantity(product.pk) == 2
+
+
+@pytest.mark.django_db
+def test_add_product_to_cart_rejects_out_of_stock() -> None:
+    cart = Cart(_FakeSession())
+    product = _make_product(_make_category(), 'Alpha', '10.00', stock=0)
+
+    result = add_product_to_cart(cart, product, 1)
+
+    assert result.status == CartStatus.OUT_OF_STOCK
+    assert result.quantity == 0
+    assert not cart.contains(product.pk)
+
+
+@pytest.mark.django_db
+def test_update_cart_quantity_sets_exact_quantity() -> None:
+    cart = Cart(_FakeSession())
+    product = _make_product(_make_category(), 'Alpha', '10.00', stock=10)
+    cart.add(product.pk, 2)
+
+    result = update_cart_quantity(cart, product, 7)
+
+    assert result.status == CartStatus.UPDATED
+    assert result.quantity == 7
+    assert cart.get_quantity(product.pk) == 7
+
+
+@pytest.mark.django_db
+def test_update_cart_quantity_caps_at_stock() -> None:
+    cart = Cart(_FakeSession())
+    product = _make_product(_make_category(), 'Alpha', '10.00', stock=4)
+    cart.add(product.pk, 2)
+
+    result = update_cart_quantity(cart, product, 20)
+
+    assert result.status == CartStatus.CAPPED
+    assert result.quantity == 4
+    assert cart.get_quantity(product.pk) == 4
+
+
+@pytest.mark.django_db
+def test_update_cart_quantity_removes_out_of_stock_line() -> None:
+    cart = Cart(_FakeSession())
+    product = _make_product(_make_category(), 'Alpha', '10.00', stock=0)
+    cart.add(product.pk, 2)
+
+    result = update_cart_quantity(cart, product, 2)
+
+    assert result.status == CartStatus.REMOVED
+    assert not cart.contains(product.pk)
+
+
+@pytest.mark.django_db
+def test_update_cart_quantity_missing_line_is_rejected() -> None:
+    cart = Cart(_FakeSession())
+    product = _make_product(_make_category(), 'Alpha', '10.00')
+
+    result = update_cart_quantity(cart, product, 2)
+
+    assert result.status == CartStatus.MISSING
+    assert cart.count() == 0
+
+
+@pytest.mark.django_db
+def test_remove_from_cart_drops_line() -> None:
+    cart = Cart(_FakeSession())
+    product = _make_product(_make_category(), 'Alpha', '10.00')
+    cart.add(product.pk, 3)
+
+    remove_from_cart(cart, product)
+
+    assert not cart.contains(product.pk)
