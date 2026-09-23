@@ -128,6 +128,47 @@ def test_product_absolute_url_and_in_stock() -> None:
 
 
 @pytest.mark.django_db
+def test_slug_auto_generated_for_english_name() -> None:
+    category = Category.objects.create(name='Shop')
+    product = Product.objects.create(
+        name='Citra Hops 50g',
+        description='',
+        price=Decimal('9.99'),
+        category=category,
+    )
+
+    assert category.slug == 'shop'
+    assert product.slug == 'citra-hops-50g'
+
+
+@pytest.mark.django_db
+def test_slug_transliterated_from_ukrainian_name() -> None:
+    category = Category.objects.create(name='Хміль')
+    product = Product.objects.create(
+        name='Хміль Карамельний',
+        description='',
+        price=Decimal('9.99'),
+        category=category,
+    )
+
+    assert category.slug == 'khmil'
+    assert product.slug.startswith('khmil')
+
+
+@pytest.mark.django_db
+def test_slug_kept_when_provided_explicitly() -> None:
+    product = Product.objects.create(
+        name='Citra Hops',
+        slug='custom-slug',
+        description='',
+        price=Decimal('9.99'),
+        category=Category.objects.create(name='Shop'),
+    )
+
+    assert product.slug == 'custom-slug'
+
+
+@pytest.mark.django_db
 def test_for_listing_annotates_rating_averages() -> None:
     from django.contrib.auth import get_user_model
 

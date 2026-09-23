@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Any
 
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -8,6 +9,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
+from apps.core.utils import make_slug
 
 
 class Category(TimeStampedModel):
@@ -40,6 +42,11 @@ class Category(TimeStampedModel):
             descendants.append(child)
             descendants.extend(child.get_descendants())
         return descendants
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        if not self.slug:
+            self.slug = make_slug(self.name)
+        super().save(*args, **kwargs)
 
 
 class ProductManager(models.Manager['Product']):
@@ -101,3 +108,8 @@ class Product(TimeStampedModel):
     @property
     def rating_count(self) -> int:
         return int(getattr(self, '_rating_count', 0) or 0)
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        if not self.slug:
+            self.slug = make_slug(self.name)
+        super().save(*args, **kwargs)
