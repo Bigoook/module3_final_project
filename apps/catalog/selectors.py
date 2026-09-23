@@ -1,8 +1,12 @@
 """Reusable query compositions shared by template views and the DRF API."""
 
+from typing import Any
+
 from django.db.models import QuerySet
 
 from apps.catalog.models import Category, Product
+from apps.orders.models import OrderItem
+from apps.reviews.models import Review
 
 ORDERING_CHOICES = {
     'name': 'name',
@@ -65,3 +69,12 @@ def get_related_products(product: Product, limit: int = 4) -> QuerySet[Product]:
         .filter(category=product.category)
         .exclude(pk=product.pk)[:limit]
     )
+
+
+def can_submit_review(user: Any, product: Product) -> bool:
+    """A user may review a product once they ordered it and have not reviewed it yet."""
+    if not user.is_authenticated:
+        return False
+    if Review.objects.filter(product=product, user=user).exists():
+        return False
+    return OrderItem.objects.filter(order__user=user, product=product).exists()

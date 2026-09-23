@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client
 
 from apps.catalog.models import Category, Product
+from apps.orders.models import Order, OrderItem
 from apps.reviews.models import Review
 
 
@@ -123,3 +124,63 @@ def test_product_detail_preloads_reviews() -> None:
 
     assert response.status_code == 200
     assert b'Great' in response.content
+
+
+@pytest.mark.django_db
+def test_product_detail_includes_related_products() -> None:
+    category = _make_category()
+    product = _make_product('Target', category)
+    related = _make_product('Related', category)
+    _make_product('Far', _make_category('Hops', 'hops'))
+
+    response = Client().get(f'/products/{product.slug}/')
+
+    assert response.status_code == 200
+    related_slugs = [p.slug for p in response.context['related_products']]
+    assert related_slugs == [related.slug]
+
+
+def _make_purchased_order(user, product) -> Order:
+    order = Order.objects.create(user=user, total_price=Decimal('1.00'))
+    OrderItem.objects.create(
+        order=order, product=product, quantity=1, price=Decimal('1.00')
+    )
+    return order
+
+
+@pytest.mark.django_db
+def test_product_detail_can_review_states() -> None:
+    category = _make_category()
+    product = _make_product('Citra Hops', category)
+    user = get_user_model().objects.create_user(username='buyer', password='pass12345')
+    client = Client()
+    url = f'/products/{product.slug}/'
+
+    assert client.get(url).context['can_review'] is False
+
+    client.force_login(user)
+    assert client.get(url).context['can_review'] is False
+
+    _make_purchased_order(user, product)
+    assert client.get(url).context['can_review'] is True
+
+    Review.objects.create(product=product, user=user, rating=4, comment='done')
+    assert client.get(url).context['can_review'] is False
+
+
+@pytest.mark.django_db
+def test_product_detail_renders_review_and_cart_forms() -> None:
+    category = _make_category()
+    product = _make_product('Citra Hops', category, stock=5)
+    user = get_user_model().objects.create_user(username='buyer', password='pass12345')
+    _make_purchased_order(user, product)
+
+    client = Client()
+    client.force_login(user)
+    response = client.get(f'/products/{product.slug}/')
+
+    assert response.status_code == 200
+    assert b'name="rating"' in response.content
+    assert b'name="comment"' in response.content
+    assert b'name="quantity"' in response.content
+    assert b'Submit review' in response.content
