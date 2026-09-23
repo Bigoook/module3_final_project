@@ -137,6 +137,7 @@ header {
     background-color: var(--border-default);
     border: 1px solid var(--border-dark-grey);
     color: var(--black-main);
+    flex: 0 0 auto;
 }
 
 .button--secondary:hover {
@@ -808,23 +809,13 @@ footer {
 
 /*
 ========================================
-    Logic for Hiding/Showing Auth Blocks
+    Auth blocks visibility is handled by
+    server-rendered {% if user.is_authenticated %}
+    in partials/header.html (see the
+    override below); the old body.user-logged-in
+    toggle no longer exists.
 ========================================
 */
-
-body:not(.user-logged-in) .header__user-actions {
-    display: none;
-}
-body:not(.user-logged-in) .header__auth-buttons {
-    display: flex;
-}
-
-body.user-logged-in .header__auth-buttons {
-    display: none;
-}
-body.user-logged-in .header__user-actions {
-    display: flex;
-}
 
 
 /*
@@ -1213,6 +1204,12 @@ body.user-logged-in .header__user-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.cart-item__quantity-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .cart-item__quantity-selector {
@@ -2057,7 +2054,16 @@ body.user-logged-in .header__user-actions {
     list-style: none;
     margin: 8px 0 0;
     padding: 8px;
-    z-index: 10;
+    z-index: 1010;
+}
+
+.header__nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    height: 8px;
 }
 
 .header__nav-dropdown:hover .header__nav-dropdown-menu,
@@ -2370,16 +2376,18 @@ body.user-logged-in .header__user-actions {
 }
 
 .category-tile {
-    padding: 24px;
-    background-color: var(--background-default);
-    border: 1px solid var(--border-default);
+    padding: 12px 24px;
+    background-color: var(--green);
+    border: 1px solid var(--green);
     border-radius: 8px;
     text-align: center;
     font-weight: 600;
+    color: var(--white-text);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .category-tile:hover {
+    background-color: #036b3a;
     transform: translateY(-3px);
     box-shadow: 0 5px 15px var(--black-100);
 }
@@ -2529,4 +2537,26 @@ body.user-logged-in .header__user-actions {
 
 .messages-container {
     padding-top: 16px;
+}
+
+.header__nav .header__nav-dropdown-menu {
+    display: none;
+    width: auto;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.header__nav .header__nav-dropdown:hover .header__nav-dropdown-menu,
+.header__nav .header__nav-dropdown:focus-within .header__nav-dropdown-menu {
+    display: block;
+}
+
+.header__nav .header__nav-dropdown-menu .header__nav-dropdown-child a {
+    padding-left: 24px;
+}
+
+.header__nav .header__nav-dropdown-menu li a:hover {
+    background-color: var(--green);
+    color: var(--white-text);
+    border-radius: 4px;
 }

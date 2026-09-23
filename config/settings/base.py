@@ -16,6 +16,10 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-local-dev-key')
 DEBUG = env.bool('DEBUG', default=False)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
+# Shop identity
+SHOP_NAME = env('SHOP_NAME', default='Brew & Barrel')
+SHOP_CURRENCY = env('SHOP_CURRENCY', default='USD')
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -60,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.core.context_processors.main_context',
             ],
         },
     },
@@ -79,6 +84,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 WSGI_APPLICATION = 'config.wsgi.application'
 
 AUTH_USER_MODEL = 'accounts.User'
+LOGIN_URL = '/login/'
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',

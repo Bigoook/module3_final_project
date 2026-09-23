@@ -12,10 +12,10 @@ from typing import Any
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.text import slugify
 from faker import Faker  # type: ignore[import-untyped]
 
 from apps.catalog.models import Category, Product
+from apps.core.utils import make_slug
 from apps.reviews.models import Review
 
 PRODUCTS: list[dict[str, Any]] = [
@@ -208,7 +208,7 @@ class Command(BaseCommand):
         for item in PRODUCTS:
             category = Category.objects.get(slug=item['category'])
             product, _ = Product.objects.get_or_create(
-                slug=slugify(item['name']),
+                slug=make_slug(item['name']),
                 defaults={
                     'name': item['name'],
                     'category': category,
