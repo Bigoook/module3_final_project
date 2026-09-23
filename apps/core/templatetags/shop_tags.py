@@ -3,15 +3,19 @@
 from decimal import Decimal
 
 from django import template
+from django.conf import settings
 from django.utils.safestring import mark_safe
 
 register = template.Library()
 
+CURRENCY_SYMBOLS = {'USD': '$', 'EUR': '€', 'UAH': '₴'}
+
 
 @register.filter
 def money(value) -> str:
-    """Format a price as USD, e.g. $12.50."""
-    return f'${Decimal(value):.2f}'
+    """Format a price using the configured shop currency, e.g. $12.50."""
+    symbol = CURRENCY_SYMBOLS.get(settings.SHOP_CURRENCY, settings.SHOP_CURRENCY)
+    return f'{symbol}{Decimal(value):.2f}'
 
 
 @register.simple_tag

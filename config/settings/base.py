@@ -16,6 +16,10 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-local-dev-key')
 DEBUG = env.bool('DEBUG', default=False)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
+# Shop identity
+SHOP_NAME = env('SHOP_NAME', default='Brew & Barrel')
+SHOP_CURRENCY = env('SHOP_CURRENCY', default='USD')
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
