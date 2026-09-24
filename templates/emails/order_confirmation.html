@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ shop_name }} — order #{{ order.order_number }}</title>
+</head>
+<body style="font-family: Inter, Arial, sans-serif; color: #1a1a1a; max-width: 600px; margin: 0 auto;">
+    <h2 style="margin-bottom: 4px;">Thank you for your order, {{ order.full_name }}!</h2>
+    <p style="color: #666;">Order #{{ order.order_number }} · {{ order.created_at|date:"j M Y" }} · {{ order.get_payment_method_display }}</p>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+        <thead>
+            <tr>
+                <th style="text-align: left; border-bottom: 1px solid #ddd; padding: 8px;">Product</th>
+                <th style="text-align: right; border-bottom: 1px solid #ddd; padding: 8px;">Qty</th>
+                <th style="text-align: right; border-bottom: 1px solid #ddd; padding: 8px;">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{{ item.product.name }}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: right;">{{ item.quantity }}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: right;">{{ item.subtotal }} {{ shop_currency }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p style="margin-top: 16px; font-size: 18px; font-weight: 700;">
+        Total: {{ order.total_price }} {{ shop_currency }}
+    </p>
+
+    <p style="color: #666; margin-top: 24px;">
+        We will ship to:<br>
+        {{ order.shipping_address|linebreaksbr }}
+    </p>
+    <p style="color: #999; font-size: 12px; margin-top: 32px;">
+        {{ shop_name }} · {{ shop_email }}
+    </p>
+</body>
+</html>

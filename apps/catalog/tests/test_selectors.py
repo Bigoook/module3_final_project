@@ -173,9 +173,7 @@ def test_listing_excludes_inactive() -> None:
 def test_product_detail_by_pk_and_slug() -> None:
     _, products = _make_products('Alpha')
     user = get_user_model().objects.create_user(username='reviewer')
-    review = Review.objects.create(
-        product=products[0], user=user, rating=5, comment='top'
-    )
+    review = Review.objects.create(product=products[0], user=user, rating=5, comment='top')
 
     detail = get_product_detail(products[0].pk)
     by_slug = get_product_detail_by_slug(products[0].slug)
@@ -252,9 +250,7 @@ def test_filter_searches_name_and_description() -> None:
         category=category,
     )
 
-    found = ProductFilter(
-        {'search': 'hops'}, queryset=Product.objects.for_listing()
-    ).qs
+    found = ProductFilter({'search': 'hops'}, queryset=Product.objects.for_listing()).qs
 
     assert {p.slug for p in found} == {'centennial'}
 
@@ -311,9 +307,7 @@ def test_filter_category_param_includes_children() -> None:
         category=child,
     )
 
-    found = ProductFilter(
-        {'category': 'malts'}, queryset=Product.objects.for_listing()
-    ).qs
+    found = ProductFilter({'category': 'malts'}, queryset=Product.objects.for_listing()).qs
 
     assert list(found) == [product]
 
@@ -329,8 +323,6 @@ def test_filter_unknown_category_is_empty() -> None:
         category=category,
     )
 
-    found = ProductFilter(
-        {'category': 'missing'}, queryset=Product.objects.for_listing()
-    ).qs
+    found = ProductFilter({'category': 'missing'}, queryset=Product.objects.for_listing()).qs
 
     assert list(found) == []

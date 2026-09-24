@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load shop_tags %}
 
-{% block title %}Order #{{ order.id }}{% endblock %}
+{% block title %}Order #{{ order.order_number }}{% endblock %}
 
 {% block content %}
 <main class="account-page-wrapper">
     <div class="account-container">
         <div class="order-detail-header">
-            <h1 class="account-form-title">Order #{{ order.id }}</h1>
+            <h1 class="account-form-title">Order #{{ order.order_number }}</h1>
             <p class="order-date">{{ order.created_at|date:"j M Y" }}</p>
             <span class="badge badge--{{ order.status }}">{{ order.get_status_display }}</span>
             <p>Payment method: {{ order.get_payment_method_display }}</p>
@@ -28,7 +28,7 @@
                         <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></td>
                         <td>{{ item.price|money }}</td>
                         <td>{{ item.quantity }}</td>
-                        <td>{{ item.line_total|money }}</td>
+                        <td>{{ item.subtotal|money }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

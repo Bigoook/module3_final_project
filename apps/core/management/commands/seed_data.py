@@ -218,7 +218,7 @@ class Command(BaseCommand):
                 },
             )
             if item['image']:
-                source = source_dir / f"{item['image']}.jpg"
+                source = source_dir / f'{item["image"]}.jpg'
                 if not source.exists():
                     raise CommandError(f'Зображення не знайдено: {source}')
                 media_products.mkdir(parents=True, exist_ok=True)

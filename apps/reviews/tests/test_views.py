@@ -18,6 +18,7 @@ def _make_product() -> Product:
         description='A test product.',
         price=Decimal('12.50'),
         category=category,
+        stock=5,
     )
 
 
@@ -51,9 +52,7 @@ def test_review_requires_a_purchase(client) -> None:
     assert response.status_code == 302
     assert response.url == _product_url(product)
     assert Review.objects.filter(product=product, user=user).count() == 0
-    assert any(
-        m.level == messages.ERROR for m in messages.get_messages(response.wsgi_request)
-    )
+    assert any(m.level == messages.ERROR for m in messages.get_messages(response.wsgi_request))
 
 
 @pytest.mark.django_db

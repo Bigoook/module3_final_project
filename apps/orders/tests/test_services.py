@@ -5,8 +5,10 @@ from django.contrib.auth import get_user_model
 
 from apps.catalog.models import Category, Product
 from apps.orders.cart import Cart
+from apps.orders.models import Order
 from apps.orders.services import (
     CartStatus,
+    OutOfStockError,
     add_product_to_cart,
     create_order,
     recalculate_total,
@@ -116,6 +118,30 @@ def test_order_reuses_order_number_counter() -> None:
 
     assert first.order_number
     assert second.order_number == first.order_number + 1
+
+
+@pytest.mark.django_db
+def test_create_order_decrements_product_stock() -> None:
+    user = get_user_model().objects.create_user(username='buyer')
+    product = _make_product(_make_category(), 'Alpha', '10.00', stock=5)
+
+    create_order(user=user, items=[(product, 2)])
+
+    product.refresh_from_db()
+    assert product.stock == 3
+
+
+@pytest.mark.django_db
+def test_create_order_out_of_stock_rolls_back() -> None:
+    user = get_user_model().objects.create_user(username='buyer')
+    product = _make_product(_make_category(), 'Alpha', '10.00', stock=2)
+
+    with pytest.raises(OutOfStockError):
+        create_order(user=user, items=[(product, 5)])
+
+    assert Order.objects.count() == 0
+    product.refresh_from_db()
+    assert product.stock == 2
 
 
 @pytest.mark.django_db
