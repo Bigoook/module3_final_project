@@ -33,6 +33,11 @@ class Order(TimeStampedModel):
         DELIVERED = 'delivered', _('delivered')
         CANCELLED = 'cancelled', _('cancelled')
 
+    class PaymentMethod(models.TextChoices):
+        CARD = 'card', _('card')
+        CASH = 'cash', _('cash on delivery')
+        BANK_TRANSFER = 'bank_transfer', _('bank transfer')
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('user'),
@@ -53,6 +58,15 @@ class Order(TimeStampedModel):
         default=0,
         validators=[MinValueValidator(Decimal('0'))],
     )
+    payment_method = models.CharField(
+        _('payment method'),
+        max_length=20,
+        choices=PaymentMethod.choices,
+        default=PaymentMethod.CARD,
+    )
+    full_name = models.CharField(_('full name'), max_length=255, blank=True, default='')
+    email = models.EmailField(_('email'), blank=True, default='')
+    phone = models.CharField(_('phone'), max_length=32, blank=True, default='')
     shipping_address = models.TextField(_('shipping address'), blank=True)
 
     class Meta:

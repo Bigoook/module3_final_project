@@ -20,6 +20,12 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 SHOP_NAME = env('SHOP_NAME', default='Brew & Barrel')
 SHOP_CURRENCY = env('SHOP_CURRENCY', default='USD')
 
+# Email notifications (Resend REST API)
+RESEND_API_KEY = env('RESEND_API_KEY', default='')
+RESEND_FROM_EMAIL = env('RESEND_FROM_EMAIL', default='orders@example.com')
+# Admin copy of order confirmations; empty disables the copy.
+SHOP_EMAIL = env('SHOP_EMAIL', default='')
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',

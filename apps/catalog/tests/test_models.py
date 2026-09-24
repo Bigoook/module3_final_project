@@ -101,9 +101,7 @@ def test_category_with_products_cannot_be_deleted() -> None:
 def test_category_absolute_url_points_to_category_listing() -> None:
     category = Category.objects.create(name='Malts', slug='malts')
 
-    assert category.get_absolute_url() == reverse(
-        'catalog:product_list', kwargs={'category_slug': 'malts'}
-    )
+    assert category.get_absolute_url() == reverse('catalog:product_list', kwargs={'category_slug': 'malts'})
 
 
 @pytest.mark.django_db
@@ -118,9 +116,7 @@ def test_product_absolute_url_and_in_stock() -> None:
         stock=0,
     )
 
-    assert product.get_absolute_url() == reverse(
-        'catalog:product_detail', kwargs={'slug': 'headphones'}
-    )
+    assert product.get_absolute_url() == reverse('catalog:product_detail', kwargs={'slug': 'headphones'})
     assert product.in_stock is False
 
     product.stock = 1

@@ -30,26 +30,52 @@ def recalculate_total(order: Order) -> None:
     order.save(update_fields=['total_price'])
 
 
+class OutOfStockError(ValueError):
+    """Raised when checkout tries to order more units than are in stock."""
+
+    def __init__(self, product_name: str, requested: int, available: int) -> None:
+        self.product_name = product_name
+        self.requested = requested
+        self.available = available
+        super().__init__(f'Only {available} of "{product_name}" are in stock ({requested} requested).')
+
+
 @transaction.atomic
 def create_order(
     *,
     user: Any,
     items: Sequence[tuple[Product, int]],
+    full_name: str = '',
+    email: str = '',
+    phone: str = '',
     shipping_address: str = '',
+    payment_method: str = Order.PaymentMethod.CARD,
 ) -> Order:
-    """Create an order with items, snapshotting product prices and summing total."""
+    """Create an order with items, snapshot prices, and decrement stock."""
     order = Order.objects.create(
         user=user,
         total_price=Decimal('0'),
+        full_name=full_name,
+        email=email,
+        phone=phone,
         shipping_address=shipping_address,
+        payment_method=payment_method,
     )
     for product, quantity in items:
+        locked = Product.objects.select_for_update().get(pk=product.pk)
+        if locked.stock < quantity:
+            raise OutOfStockError(
+                product_name=locked.name,
+                requested=quantity,
+                available=locked.stock,
+            )
         OrderItem.objects.create(
             order=order,
-            product=product,
+            product=locked,
             quantity=quantity,
-            price=product.price,
+            price=locked.price,
         )
+        Product.objects.filter(pk=locked.pk).update(stock=locked.stock - quantity)
     recalculate_total(order)
     return order
 

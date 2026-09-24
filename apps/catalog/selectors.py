@@ -64,11 +64,7 @@ def get_product_detail_by_slug(slug: str) -> Product | None:
 
 def get_related_products(product: Product, limit: int = 4) -> QuerySet[Product]:
     """Other active products from the same category."""
-    return (
-        Product.objects.for_listing()
-        .filter(category=product.category)
-        .exclude(pk=product.pk)[:limit]
-    )
+    return Product.objects.for_listing().filter(category=product.category).exclude(pk=product.pk)[:limit]
 
 
 def can_submit_review(user: Any, product: Product) -> bool:

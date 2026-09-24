@@ -1,16 +1,21 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
-from django.views.generic import RedirectView, TemplateView
+from django.views.generic import DetailView, RedirectView, TemplateView
 
 from apps.catalog.models import Product
+from apps.core.emailing import send_order_confirmation
 from apps.orders.cart import Cart
-from apps.orders.forms import AddToCartForm
+from apps.orders.forms import AddToCartForm, CheckoutForm
+from apps.orders.models import Order
 from apps.orders.selectors import get_cart_lines, get_cart_total
 from apps.orders.services import (
     CartStatus,
+    OutOfStockError,
     add_product_to_cart,
+    create_order,
     remove_from_cart,
     update_cart_quantity,
 )
@@ -111,7 +116,71 @@ class CartRemoveView(View):
         return redirect('orders:cart')
 
 
-class CheckoutView(RedirectView):
-    """Placeholder until the checkout flow is implemented (see block 3.4)."""
+class CheckoutView(LoginRequiredMixin, TemplateView):
+    """Collect delivery data, create the order, and notify by email."""
+
+    template_name = 'orders/checkout.html'
+
+    def get_context_data(self, **kwargs):
+        cart = Cart(self.request.session)
+        lines = get_cart_lines(cart)
+        context = super().get_context_data(**kwargs)
+        context['form'] = kwargs.get('form') or CheckoutForm()
+        context['lines'] = lines
+        context['total'] = get_cart_total(lines)
+        context['is_empty'] = not lines
+        return context
+
+    def get(self, request: HttpRequest, *args, **kwargs):
+        cart = Cart(request.session)
+        if not get_cart_lines(cart):
+            messages.info(request, 'Your cart is empty.')
+            return redirect('orders:cart')
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request: HttpRequest, *args, **kwargs):
+        cart = Cart(request.session)
+        lines = get_cart_lines(cart)
+        if not lines:
+            messages.info(request, 'Your cart is empty.')
+            return redirect('catalog:home')
+
+        form = CheckoutForm(request.POST)
+        if not form.is_valid():
+            return self.render_to_response(self.get_context_data(form=form))
+
+        items = [(line['product'], line['quantity']) for line in lines]
+        try:
+            order = create_order(
+                user=request.user,
+                items=items,
+                **form.cleaned_data,
+            )
+        except OutOfStockError as exc:
+            messages.error(request, str(exc))
+            return self.render_to_response(self.get_context_data(form=form))
+
+        cart.clear()
+        send_order_confirmation(order)
+        messages.success(
+            request,
+            f'Order #{order.order_number} placed. A confirmation email is on its way.',
+        )
+        return redirect('orders:order_detail', pk=order.pk)
+
+
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    """Order summary for the owner; doubles as the post-checkout confirmation."""
+
+    template_name = 'orders/order_detail.html'
+    context_object_name = 'order'
+    queryset = Order.objects.select_related('user').prefetch_related('items__product')
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+
+class OrderListView(RedirectView):
+    """Placeholder until the order list is built in block 3.5."""
 
     pattern_name = 'catalog:home'

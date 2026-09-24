@@ -88,9 +88,7 @@ def test_product_list_filters_via_sidebar_params() -> None:
     _make_product('A Malt', malts, price=Decimal('1.00'), stock=0)
     _make_product('B Malt', malts, price=Decimal('15.00'), stock=5)
 
-    filtered = Client().get(
-        '/products/?category=malts&search=malt&min_price=10&in_stock=true'
-    )
+    filtered = Client().get('/products/?category=malts&search=malt&min_price=10&in_stock=true')
 
     assert filtered.status_code == 200
     assert [p.slug for p in filtered.context['products']] == ['b-malt']
@@ -142,9 +140,7 @@ def test_product_detail_includes_related_products() -> None:
 
 def _make_purchased_order(user, product) -> Order:
     order = Order.objects.create(user=user, total_price=Decimal('1.00'))
-    OrderItem.objects.create(
-        order=order, product=product, quantity=1, price=Decimal('1.00')
-    )
+    OrderItem.objects.create(order=order, product=product, quantity=1, price=Decimal('1.00'))
     return order
 
 
