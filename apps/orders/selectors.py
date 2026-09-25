@@ -1,10 +1,21 @@
-"""Read-only queries for the session cart, shared by views and the API."""
+"""Read-only queries for the session cart and order history."""
 
 from decimal import Decimal
 from typing import Any
 
+from django.db.models import QuerySet
+
 from apps.catalog.models import Product
 from apps.orders.cart import Cart
+from apps.orders.models import Order
+
+
+def get_user_orders(user: Any, *, status: str = '') -> QuerySet[Order]:
+    """The user's orders, optionally narrowed to one status."""
+    queryset = Order.objects.filter(user=user).prefetch_related('items__product')
+    if status and status in Order.Status.values:
+        queryset = queryset.filter(status=status)
+    return queryset
 
 
 def get_cart_lines(cart: Cart) -> list[dict[str, Any]]:

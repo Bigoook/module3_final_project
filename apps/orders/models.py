@@ -4,6 +4,7 @@ from typing import Any
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
@@ -84,6 +85,9 @@ class Order(TimeStampedModel):
         if not self.order_number:
             self.order_number = OrderNumber.next()
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self) -> str:
+        return reverse('orders:order_detail', kwargs={'pk': self.pk})
 
     def __str__(self) -> str:
         return f'Order #{self.order_number}'

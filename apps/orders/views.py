@@ -1,16 +1,18 @@
+from typing import TYPE_CHECKING, cast
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
-from django.views.generic import DetailView, RedirectView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
 
 from apps.catalog.models import Product
 from apps.core.emailing import send_order_confirmation
 from apps.orders.cart import Cart
 from apps.orders.forms import AddToCartForm, CheckoutForm
 from apps.orders.models import Order
-from apps.orders.selectors import get_cart_lines, get_cart_total
+from apps.orders.selectors import get_cart_lines, get_cart_total, get_user_orders
 from apps.orders.services import (
     CartStatus,
     OutOfStockError,
@@ -19,6 +21,9 @@ from apps.orders.services import (
     remove_from_cart,
     update_cart_quantity,
 )
+
+if TYPE_CHECKING:
+    from apps.accounts.models import User
 
 
 class CartView(TemplateView):
@@ -125,11 +130,23 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
         cart = Cart(self.request.session)
         lines = get_cart_lines(cart)
         context = super().get_context_data(**kwargs)
-        context['form'] = kwargs.get('form') or CheckoutForm()
+        context['form'] = kwargs.get('form') or self._checkout_form()
         context['lines'] = lines
         context['total'] = get_cart_total(lines)
         context['is_empty'] = not lines
         return context
+
+    def _checkout_form(self) -> CheckoutForm:
+        user = cast('User', self.request.user)
+        full_name = ' '.join(part for part in (user.first_name, user.last_name) if part)
+        return CheckoutForm(
+            initial={
+                'full_name': full_name,
+                'email': user.email,
+                'phone': user.phone,
+                'shipping_address': user.default_address,
+            },
+        )
 
     def get(self, request: HttpRequest, *args, **kwargs):
         cart = Cart(request.session)
@@ -180,7 +197,20 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class OrderListView(RedirectView):
-    """Placeholder until the order list is built in block 3.5."""
+class OrderListView(LoginRequiredMixin, ListView):
+    """The user's order history with optional status filtering."""
 
-    pattern_name = 'catalog:home'
+    template_name = 'orders/order_list.html'
+    context_object_name = 'orders'
+    paginate_by = 10
+
+    def get_queryset(self):
+        status = self.request.GET.get('status', '')
+        return get_user_orders(self.request.user, status=status)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        status = self.request.GET.get('status', '')
+        context['statuses'] = Order.Status.choices
+        context['current_status'] = status if status in Order.Status.values else ''
+        return context

@@ -242,6 +242,50 @@ def test_checkout_invalid_form_rerenders_without_creating_order(client) -> None:
 
 
 @pytest.mark.django_db
+def test_checkout_prefills_fields_from_user_profile(client) -> None:
+    user = get_user_model().objects.create_user(
+        username='buyer',
+        password='pass',
+        email='buyer@example.com',
+        first_name='Test',
+        last_name='Buyer',
+        phone='+380 12 345 67 89',
+        default_address='Khreshchatyk 1, Kyiv',
+    )
+    client.force_login(user)
+    product = _make_product(stock=5)
+    session = client.session
+    session[CART_SESSION_KEY] = {str(product.pk): 2}
+    session.save()
+
+    response = client.get(reverse('orders:checkout'))
+
+    assert response.status_code == 200
+    form = response.context['form']
+    assert form.initial['full_name'] == 'Test Buyer'
+    assert form['full_name'].value() == 'Test Buyer'
+    assert form['email'].value() == 'buyer@example.com'
+    assert form['phone'].value() == '+380 12 345 67 89'
+    assert form['shipping_address'].value() == 'Khreshchatyk 1, Kyiv'
+
+
+@pytest.mark.django_db
+def test_checkout_form_does_not_show_blank_full_name(client) -> None:
+    user = get_user_model().objects.create_user(username='buyer', password='pass')
+    client.force_login(user)
+    product = _make_product(stock=5)
+    session = client.session
+    session[CART_SESSION_KEY] = {str(product.pk): 2}
+    session.save()
+
+    response = client.get(reverse('orders:checkout'))
+
+    form = response.context['form']
+    assert not form['full_name'].value()
+    assert not form['shipping_address'].value()
+
+
+@pytest.mark.django_db
 @patch('apps.orders.views.send_order_confirmation')
 def test_checkout_places_order_and_clears_cart(send_mock, client) -> None:
     user = get_user_model().objects.create_user(username='buyer', password='pass')
