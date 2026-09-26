@@ -8,6 +8,7 @@ from config.admin_site import shop_admin_site
 urlpatterns = [
     path('admin/', shop_admin_site.urls),
     path('health/', health, name='health'),
+    path('api/', include('apps.api.urls')),
     path('', include('apps.catalog.urls')),
     path('', include('apps.accounts.urls')),
     path('', include('apps.orders.urls')),

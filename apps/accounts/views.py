@@ -20,6 +20,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from apps.accounts.forms import ProfileForm, RegistrationForm
+from apps.accounts.services import register_user
 
 
 class LoginView(DjangoLoginView):
@@ -42,7 +43,11 @@ class RegisterView(View):
     def post(self, request: HttpRequest) -> HttpResponse:
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = register_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password1'],
+            )
             login(request, user)
             messages.success(request, f'Welcome, {user.username}!')
             return redirect('catalog:home')
