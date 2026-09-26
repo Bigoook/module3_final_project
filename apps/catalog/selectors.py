@@ -67,6 +67,36 @@ def get_related_products(product: Product, limit: int = 4) -> QuerySet[Product]:
     return Product.objects.for_listing().filter(category=product.category).exclude(pk=product.pk)[:limit]
 
 
+def get_product_page_context(product: Product, user: Any) -> dict[str, Any]:
+    """Context shared by every render of the product page (detail and review posting)."""
+    return {
+        'reviews': list(product.reviews.all()),
+        'related_products': get_related_products(product),
+        'can_review': can_submit_review(user, product),
+    }
+
+
+def get_category_options() -> list[tuple[int, str]]:
+    """Category tree flattened into indented (pk, label) choices for admin filters.
+
+    Reuses ``Category.get_descendants()`` for the pre-order traversal; indentation
+    depth is resolved through a single parent-pk lookup map.
+    """
+    parents = dict(Category.objects.values_list('pk', 'parent_id'))
+    options: list[tuple[int, str]] = []
+
+    for root in Category.objects.filter(parent__isnull=True):
+        for category in (root, *root.get_descendants()):
+            depth = 0
+            parent_id = category.parent_id
+            while parent_id in parents:
+                parent_id = parents[parent_id]
+                depth += 1
+            options.append((category.pk, ('— ' * depth) + category.name))
+
+    return options
+
+
 def can_submit_review(user: Any, product: Product) -> bool:
     """A user may review a product once they ordered it and have not reviewed it yet."""
     if not user.is_authenticated:

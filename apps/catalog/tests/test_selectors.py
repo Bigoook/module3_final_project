@@ -12,27 +12,17 @@ from apps.catalog.selectors import (
     get_product_listing,
     get_related_products,
 )
+from apps.factories import make_product
 from apps.reviews.models import Review
 
 
-def _make_products(*names: str) -> tuple[Category, list[Product]]:
-    category = Category.objects.create(name='Shop', slug='shop')
-    products = [
-        Product.objects.create(
-            name=name,
-            slug=name.replace(' ', '-'),
-            description='',
-            price=Decimal('9.99'),
-            category=category,
-        )
-        for name in names
-    ]
-    return category, products
+def _make_products(*names: str) -> list[Product]:
+    return [make_product(name=name) for name in names]
 
 
 @pytest.mark.django_db
 def test_featured_orders_by_rating_then_newest_and_limits() -> None:
-    _, products = _make_products('Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta')
+    products = _make_products('Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta')
     user = get_user_model().objects.create_user(username='reviewer')
 
     Review.objects.create(product=products[2], user=user, rating=5, comment='top')
@@ -114,7 +104,7 @@ def test_listing_unknown_category_returns_empty() -> None:
 
 @pytest.mark.django_db
 def test_listing_applies_ordering() -> None:
-    _, products = _make_products('B', 'A')
+    products = _make_products('B', 'A')
 
     listed = list(get_product_listing(ordering='name'))
 
@@ -123,7 +113,7 @@ def test_listing_applies_ordering() -> None:
 
 @pytest.mark.django_db
 def test_listing_orders_by_rating_annotation() -> None:
-    _, products = _make_products('Alpha', 'Beta')
+    products = _make_products('Alpha', 'Beta')
     user = get_user_model().objects.create_user(username='reviewer')
 
     Review.objects.create(product=products[0], user=user, rating=5, comment='top')
@@ -147,7 +137,7 @@ def test_listing_orders_by_rating_annotation() -> None:
 
 @pytest.mark.django_db
 def test_listing_ignores_unknown_ordering() -> None:
-    _, products = _make_products('Alpha', 'Beta')
+    products = _make_products('Alpha', 'Beta')
 
     listed = list(get_product_listing(ordering='rating; DROP TABLE product'))
 
@@ -171,7 +161,7 @@ def test_listing_excludes_inactive() -> None:
 
 @pytest.mark.django_db
 def test_product_detail_by_pk_and_slug() -> None:
-    _, products = _make_products('Alpha')
+    products = _make_products('Alpha')
     user = get_user_model().objects.create_user(username='reviewer')
     review = Review.objects.create(product=products[0], user=user, rating=5, comment='top')
 

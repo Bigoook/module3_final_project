@@ -24,19 +24,6 @@
                 {% endfor %}
             </div>
         </section>
-
-        {% if categories %}
-        <section class="category-tiles-section">
-            <h2 class="section-title">Shop by category</h2>
-            <div class="category-tiles">
-                {% for category in categories %}
-                    <a href="{{ category.get_absolute_url }}" class="category-tile">
-                        <span class="category-tile__name">{{ category.name }}</span>
-                    </a>
-                {% endfor %}
-            </div>
-        </section>
-        {% endif %}
     </div>
 </main>
 {% endblock %}

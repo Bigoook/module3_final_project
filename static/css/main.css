@@ -789,15 +789,35 @@ footer {
     gap: 24px;
 }
 
-.user-icon, .cart-icon {
+.cart-icon {
     display: block;
     width: 38px;
     height: 38px;
 }
 
+.user-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    height: 38px;
+    text-decoration: none;
+    color: var(--black-main);
+}
+
 .user-icon img, .cart-icon img {
     width: 100%;
     height: 100%;
+}
+
+.user-icon img {
+    width: 38px;
+    height: 38px;
+}
+
+.user-icon__name {
+    font-size: 14px;
+    white-space: nowrap;
 }
 
 .button--logout {
@@ -2363,36 +2383,7 @@ footer {
     width: 100%;
 }
 
-/*
-========================================
-    Category tiles (catalog/home.html)
-========================================
-*/
-.category-tiles {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
-}
-
-.category-tile {
-    padding: 12px 24px;
-    background-color: var(--green);
-    border: 1px solid var(--green);
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 600;
-    color: var(--white-text);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.category-tile:hover {
-    background-color: #036b3a;
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px var(--black-100);
-}
-
-.featured-section, .category-tiles-section, .related-products {
+.featured-section, .related-products {
     margin-bottom: 64px;
 }
 

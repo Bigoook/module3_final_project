@@ -31,6 +31,7 @@
             {% if user.is_authenticated %}
                 <a href="{% url 'accounts:profile' %}" class="user-icon" aria-label="My Account">
                     <img src="{% static 'img/icons/User_alt.svg' %}" alt="User Account">
+                    <span class="user-icon__name">{{ user.get_full_name|default:user.username }}</span>
                 </a>
             {% else %}
                 <a href="{% url 'accounts:login' %}" class="button button--secondary">Sign in</a>

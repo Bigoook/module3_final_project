@@ -1,38 +1,24 @@
-from decimal import Decimal
-
 import pytest
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-from apps.catalog.models import Category, Product
+from apps.factories import make_product
 from apps.orders.services import create_order
 from apps.reviews.models import Review
 
 
-def _make_product() -> Product:
-    category = Category.objects.create(name='Shop', slug='shop')
-    return Product.objects.create(
-        name='Alpha',
-        slug='alpha',
-        description='A test product.',
-        price=Decimal('12.50'),
-        category=category,
-        stock=5,
-    )
-
-
-def _product_url(product: Product) -> str:
+def _product_url(product) -> str:
     return reverse('catalog:product_detail', kwargs={'slug': product.slug})
 
 
-def _review_url(product: Product) -> str:
+def _review_url(product) -> str:
     return reverse('reviews:create', kwargs={'slug': product.slug})
 
 
 @pytest.mark.django_db
 def test_guest_is_redirected_to_login(client) -> None:
-    product = _make_product()
+    product = make_product()
 
     response = client.get(_review_url(product), follow=True)
 
@@ -43,7 +29,7 @@ def test_guest_is_redirected_to_login(client) -> None:
 
 @pytest.mark.django_db
 def test_review_requires_a_purchase(client) -> None:
-    product = _make_product()
+    product = make_product()
     user = get_user_model().objects.create_user(username='buyer')
     client.force_login(user)
 
@@ -57,7 +43,7 @@ def test_review_requires_a_purchase(client) -> None:
 
 @pytest.mark.django_db
 def test_purchased_user_can_submit_review(client) -> None:
-    product = _make_product()
+    product = make_product()
     user = get_user_model().objects.create_user(username='buyer')
     create_order(user=user, items=[(product, 1)])
     client.force_login(user)
@@ -74,7 +60,7 @@ def test_purchased_user_can_submit_review(client) -> None:
 
 @pytest.mark.django_db
 def test_user_cannot_review_same_product_twice(client) -> None:
-    product = _make_product()
+    product = make_product()
     user = get_user_model().objects.create_user(username='buyer')
     create_order(user=user, items=[(product, 1)])
     Review.objects.create(product=product, user=user, rating=5, comment='First')
@@ -87,7 +73,7 @@ def test_user_cannot_review_same_product_twice(client) -> None:
 
 @pytest.mark.django_db
 def test_invalid_review_form_is_rerendered_with_errors(client) -> None:
-    product = _make_product()
+    product = make_product()
     user = get_user_model().objects.create_user(username='buyer')
     create_order(user=user, items=[(product, 1)])
     client.force_login(user)
