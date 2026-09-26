@@ -4,31 +4,16 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.test import Client
 
-from apps.catalog.models import Category, Product
+from apps.catalog.models import Category
+from apps.factories import make_category, make_product
 from apps.orders.models import Order, OrderItem
 from apps.reviews.models import Review
 
 
-def _make_category(name: str = 'Shop', slug: str = 'shop') -> Category:
-    return Category.objects.create(name=name, slug=slug)
-
-
-def _make_product(name: str, category: Category, **kwargs):
-    price = kwargs.pop('price', Decimal('9.99'))
-    return Product.objects.create(
-        name=name,
-        slug=name.replace(' ', '-').lower(),
-        description='description',
-        price=price,
-        category=category,
-        **kwargs,
-    )
-
-
 @pytest.mark.django_db
 def test_home_renders_featured_products() -> None:
-    category = _make_category()
-    product = _make_product('Citra Hops', category)
+    category = make_category()
+    product = make_product('Citra Hops', category)
 
     response = Client().get('/')
 
@@ -38,7 +23,7 @@ def test_home_renders_featured_products() -> None:
 
 @pytest.mark.django_db
 def test_home_header_lists_child_categories() -> None:
-    parent = _make_category('Malts', 'malts')
+    parent = make_category('Malts', 'malts')
     Category.objects.create(name='Base Malts', slug='base-malts', parent=parent)
 
     response = Client().get('/')
@@ -50,9 +35,9 @@ def test_home_header_lists_child_categories() -> None:
 
 @pytest.mark.django_db
 def test_product_list_renders_products_with_pagination_context() -> None:
-    category = _make_category()
+    category = make_category()
     for index in range(13):
-        _make_product(f'Hops {index}', category)
+        make_product(f'Hops {index}', category)
 
     response = Client().get('/products/')
 
@@ -64,11 +49,11 @@ def test_product_list_renders_products_with_pagination_context() -> None:
 
 @pytest.mark.django_db
 def test_product_list_respects_ordering_and_category() -> None:
-    malts = _make_category('Malts', 'malts')
-    hops = _make_category('Hops', 'hops')
-    a_malt = _make_product('A Malt', malts)
-    b_malt = _make_product('B Malt', malts)
-    hop = _make_product('Hop', hops)
+    malts = make_category('Malts', 'malts')
+    hops = make_category('Hops', 'hops')
+    a_malt = make_product('A Malt', malts)
+    b_malt = make_product('B Malt', malts)
+    hop = make_product('Hop', hops)
 
     response = Client().get('/products/?ordering=name')
 
@@ -83,10 +68,10 @@ def test_product_list_respects_ordering_and_category() -> None:
 
 @pytest.mark.django_db
 def test_product_list_filters_via_sidebar_params() -> None:
-    malts = _make_category('Malts', 'malts')
-    _make_product('Citra Hops', _make_category('Hops', 'hops'))
-    _make_product('A Malt', malts, price=Decimal('1.00'), stock=0)
-    _make_product('B Malt', malts, price=Decimal('15.00'), stock=5)
+    malts = make_category('Malts', 'malts')
+    make_product('Citra Hops', make_category('Hops', 'hops'))
+    make_product('A Malt', malts, price=Decimal('1.00'), stock=0)
+    make_product('B Malt', malts, price=Decimal('15.00'), stock=5)
 
     filtered = Client().get('/products/?category=malts&search=malt&min_price=10&in_stock=true')
 
@@ -97,9 +82,9 @@ def test_product_list_filters_via_sidebar_params() -> None:
 
 @pytest.mark.django_db
 def test_product_detail_renders_active_product_and_404s_otherwise() -> None:
-    category = _make_category()
-    product = _make_product('Citra Hops', category)
-    inactive = _make_product('Hidden', category, is_active=False)
+    category = make_category()
+    product = make_product('Citra Hops', category)
+    inactive = make_product('Hidden', category, is_active=False)
 
     response = Client().get(f'/products/{product.slug}/')
     hidden = Client().get(f'/products/{inactive.slug}/')
@@ -113,8 +98,8 @@ def test_product_detail_renders_active_product_and_404s_otherwise() -> None:
 
 @pytest.mark.django_db
 def test_product_detail_preloads_reviews() -> None:
-    category = _make_category()
-    product = _make_product('Citra Hops', category)
+    category = make_category()
+    product = make_product('Citra Hops', category)
     user = get_user_model().objects.create_user(username='reviewer')
     Review.objects.create(product=product, user=user, rating=5, comment='Great')
 
@@ -126,10 +111,10 @@ def test_product_detail_preloads_reviews() -> None:
 
 @pytest.mark.django_db
 def test_product_detail_includes_related_products() -> None:
-    category = _make_category()
-    product = _make_product('Target', category)
-    related = _make_product('Related', category)
-    _make_product('Far', _make_category('Hops', 'hops'))
+    category = make_category()
+    product = make_product('Target', category)
+    related = make_product('Related', category)
+    make_product('Far', make_category('Hops', 'hops'))
 
     response = Client().get(f'/products/{product.slug}/')
 
@@ -146,8 +131,8 @@ def _make_purchased_order(user, product) -> Order:
 
 @pytest.mark.django_db
 def test_product_detail_can_review_states() -> None:
-    category = _make_category()
-    product = _make_product('Citra Hops', category)
+    category = make_category()
+    product = make_product('Citra Hops', category)
     user = get_user_model().objects.create_user(username='buyer', password='pass12345')
     client = Client()
     url = f'/products/{product.slug}/'
@@ -166,8 +151,8 @@ def test_product_detail_can_review_states() -> None:
 
 @pytest.mark.django_db
 def test_product_detail_renders_review_and_cart_forms() -> None:
-    category = _make_category()
-    product = _make_product('Citra Hops', category, stock=5)
+    category = make_category()
+    product = make_product('Citra Hops', category, stock=5)
     user = get_user_model().objects.create_user(username='buyer', password='pass12345')
     _make_purchased_order(user, product)
 

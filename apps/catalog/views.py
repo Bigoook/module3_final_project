@@ -4,11 +4,10 @@ from django.views.generic import DetailView, ListView, TemplateView
 from apps.catalog.filters import ProductFilter
 from apps.catalog.models import Product
 from apps.catalog.selectors import (
-    can_submit_review,
     get_featured_products,
     get_product_detail_by_slug,
     get_product_listing,
-    get_related_products,
+    get_product_page_context,
 )
 from apps.orders.forms import AddToCartForm
 from apps.reviews.forms import ReviewForm
@@ -57,9 +56,7 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product: Product = self.object
-        context['reviews'] = list(product.reviews.all())
-        context['related_products'] = get_related_products(product)
-        context['can_review'] = can_submit_review(self.request.user, product)
+        context.update(get_product_page_context(product, self.request.user))
         context['review_form'] = ReviewForm()
         context['cart_form'] = AddToCartForm()
         return context

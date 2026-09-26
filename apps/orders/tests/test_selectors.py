@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pytest
 
-from apps.catalog.models import Category, Product
+from apps.factories import make_product
 from apps.orders.cart import Cart
 from apps.orders.selectors import get_cart_lines, get_cart_total
 
@@ -11,24 +11,13 @@ class _FakeSession(dict):
     modified = False
 
 
-def _make_product(name: str = 'Alpha', price: str = '10.00') -> Product:
-    category, _ = Category.objects.get_or_create(name='Shop', slug='shop')
-    return Product.objects.create(
-        name=name,
-        slug=name.lower().replace(' ', '-'),
-        description='',
-        price=Decimal(price),
-        category=category,
-    )
-
-
 def _make_cart() -> Cart:
     return Cart(_FakeSession())
 
 
 @pytest.mark.django_db
 def test_get_cart_lines_carry_live_prices() -> None:
-    product = _make_product(price='10.00')
+    product = make_product(price='10.00')
     cart = _make_cart()
     cart.add(product.pk, 2)
 
@@ -42,8 +31,8 @@ def test_get_cart_lines_carry_live_prices() -> None:
 
 @pytest.mark.django_db
 def test_get_cart_lines_skip_inactive_products() -> None:
-    active = _make_product(name='Alpha', price='10.00')
-    hidden = _make_product(name='Hidden', price='5.00')
+    active = make_product(name='Alpha', price='10.00')
+    hidden = make_product(name='Hidden', price='5.00')
     hidden.is_active = False
     hidden.save()
     cart = _make_cart()
@@ -58,7 +47,7 @@ def test_get_cart_lines_skip_inactive_products() -> None:
 
 @pytest.mark.django_db
 def test_get_cart_lines_skip_deleted_products() -> None:
-    product = _make_product()
+    product = make_product()
     cart = _make_cart()
     cart.add(product.pk, 2)
     product.delete()
@@ -68,8 +57,8 @@ def test_get_cart_lines_skip_deleted_products() -> None:
 
 @pytest.mark.django_db
 def test_get_cart_total_sums_line_totals() -> None:
-    first = _make_product(name='Alpha', price='10.00')
-    second = _make_product(name='Beta', price='5.50')
+    first = make_product(name='Alpha', price='10.00')
+    second = make_product(name='Beta', price='5.50')
     cart = _make_cart()
     cart.add(first.pk, 2)
     cart.add(second.pk, 3)

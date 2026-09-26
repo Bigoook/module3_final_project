@@ -3,7 +3,7 @@ from decimal import Decimal
 import pytest
 from django.contrib.auth import get_user_model
 
-from apps.catalog.models import Category, Product
+from apps.factories import make_category, make_product
 from apps.orders.cart import Cart
 from apps.orders.models import Order
 from apps.orders.services import (
@@ -23,26 +23,12 @@ class _FakeSession(dict):
     modified = False
 
 
-def _make_category() -> Category:
-    return Category.objects.create(name='Shop', slug='shop')
-
-
-def _make_product(category: Category, name: str, price: str, stock: int = 10) -> Product:
-    return Product.objects.create(
-        name=name,
-        description='',
-        price=Decimal(price),
-        category=category,
-        stock=stock,
-    )
-
-
 @pytest.mark.django_db
 def test_create_order_sums_subtotals_and_snapshots_prices() -> None:
     user = get_user_model().objects.create_user(username='buyer')
-    category = _make_category()
-    first = _make_product(category, 'Alpha', '10.00')
-    second = _make_product(category, 'Beta', '5.50')
+    category = make_category()
+    first = make_product(category=category, name='Alpha', price='10.00')
+    second = make_product(category=category, name='Beta', price='5.50')
 
     order = create_order(user=user, items=[(first, 2), (second, 3)], shipping_address='Kyiv')
 
@@ -57,7 +43,7 @@ def test_create_order_sums_subtotals_and_snapshots_prices() -> None:
 @pytest.mark.django_db
 def test_update_quantity_recalculates_total() -> None:
     user = get_user_model().objects.create_user(username='buyer')
-    product = _make_product(_make_category(), 'Alpha', '10.00')
+    product = make_product(name='Alpha', price='10.00')
     order = create_order(user=user, items=[(product, 2)])
 
     update_item_quantity(order, product, 5)
@@ -69,9 +55,9 @@ def test_update_quantity_recalculates_total() -> None:
 @pytest.mark.django_db
 def test_remove_item_recalculates_total() -> None:
     user = get_user_model().objects.create_user(username='buyer')
-    category = _make_category()
-    first = _make_product(category, 'Alpha', '10.00')
-    second = _make_product(category, 'Beta', '5.00')
+    category = make_category()
+    first = make_product(category=category, name='Alpha', price='10.00')
+    second = make_product(category=category, name='Beta', price='5.00')
     order = create_order(user=user, items=[(first, 2), (second, 1)])
 
     remove_item(order, first)
@@ -83,7 +69,7 @@ def test_remove_item_recalculates_total() -> None:
 @pytest.mark.django_db
 def test_removing_last_item_sets_total_to_zero() -> None:
     user = get_user_model().objects.create_user(username='buyer')
-    product = _make_product(_make_category(), 'Alpha', '10.00')
+    product = make_product(name='Alpha', price='10.00')
     order = create_order(user=user, items=[(product, 2)])
 
     remove_item(order, product)
@@ -95,9 +81,9 @@ def test_removing_last_item_sets_total_to_zero() -> None:
 @pytest.mark.django_db
 def test_recalculate_total_matches_summed_subtotals() -> None:
     user = get_user_model().objects.create_user(username='buyer')
-    category = _make_category()
-    first = _make_product(category, 'Alpha', '10.00')
-    second = _make_product(category, 'Beta', '5.50')
+    category = make_category()
+    first = make_product(category=category, name='Alpha', price='10.00')
+    second = make_product(category=category, name='Beta', price='5.50')
     order = create_order(user=user, items=[(first, 3), (second, 4)])
 
     expected = sum(item.subtotal for item in order.items.all())
@@ -111,7 +97,7 @@ def test_recalculate_total_matches_summed_subtotals() -> None:
 @pytest.mark.django_db
 def test_order_reuses_order_number_counter() -> None:
     user = get_user_model().objects.create_user(username='buyer')
-    product = _make_product(_make_category(), 'Alpha', '1.00')
+    product = make_product(name='Alpha', price='1.00')
 
     first = create_order(user=user, items=[(product, 1)])
     second = create_order(user=user, items=[(product, 1)])
@@ -123,7 +109,7 @@ def test_order_reuses_order_number_counter() -> None:
 @pytest.mark.django_db
 def test_create_order_decrements_product_stock() -> None:
     user = get_user_model().objects.create_user(username='buyer')
-    product = _make_product(_make_category(), 'Alpha', '10.00', stock=5)
+    product = make_product(name='Alpha', price='10.00', stock=5)
 
     create_order(user=user, items=[(product, 2)])
 
@@ -134,7 +120,7 @@ def test_create_order_decrements_product_stock() -> None:
 @pytest.mark.django_db
 def test_create_order_out_of_stock_rolls_back() -> None:
     user = get_user_model().objects.create_user(username='buyer')
-    product = _make_product(_make_category(), 'Alpha', '10.00', stock=2)
+    product = make_product(name='Alpha', price='10.00', stock=2)
 
     with pytest.raises(OutOfStockError):
         create_order(user=user, items=[(product, 5)])
@@ -147,7 +133,7 @@ def test_create_order_out_of_stock_rolls_back() -> None:
 @pytest.mark.django_db
 def test_add_product_to_cart_returns_added() -> None:
     cart = Cart(_FakeSession())
-    product = _make_product(_make_category(), 'Alpha', '10.00', stock=5)
+    product = make_product(name='Alpha', price='10.00', stock=5)
 
     result = add_product_to_cart(cart, product, 3)
 
@@ -159,7 +145,7 @@ def test_add_product_to_cart_returns_added() -> None:
 @pytest.mark.django_db
 def test_add_product_to_cart_caps_at_stock() -> None:
     cart = Cart(_FakeSession())
-    product = _make_product(_make_category(), 'Alpha', '10.00', stock=2)
+    product = make_product(name='Alpha', price='10.00', stock=2)
 
     result = add_product_to_cart(cart, product, 5)
 
@@ -171,7 +157,7 @@ def test_add_product_to_cart_caps_at_stock() -> None:
 @pytest.mark.django_db
 def test_add_product_to_cart_rejects_out_of_stock() -> None:
     cart = Cart(_FakeSession())
-    product = _make_product(_make_category(), 'Alpha', '10.00', stock=0)
+    product = make_product(name='Alpha', price='10.00', stock=0)
 
     result = add_product_to_cart(cart, product, 1)
 
@@ -183,7 +169,7 @@ def test_add_product_to_cart_rejects_out_of_stock() -> None:
 @pytest.mark.django_db
 def test_update_cart_quantity_sets_exact_quantity() -> None:
     cart = Cart(_FakeSession())
-    product = _make_product(_make_category(), 'Alpha', '10.00', stock=10)
+    product = make_product(name='Alpha', price='10.00', stock=10)
     cart.add(product.pk, 2)
 
     result = update_cart_quantity(cart, product, 7)
@@ -196,7 +182,7 @@ def test_update_cart_quantity_sets_exact_quantity() -> None:
 @pytest.mark.django_db
 def test_update_cart_quantity_caps_at_stock() -> None:
     cart = Cart(_FakeSession())
-    product = _make_product(_make_category(), 'Alpha', '10.00', stock=4)
+    product = make_product(name='Alpha', price='10.00', stock=4)
     cart.add(product.pk, 2)
 
     result = update_cart_quantity(cart, product, 20)
@@ -209,7 +195,7 @@ def test_update_cart_quantity_caps_at_stock() -> None:
 @pytest.mark.django_db
 def test_update_cart_quantity_removes_out_of_stock_line() -> None:
     cart = Cart(_FakeSession())
-    product = _make_product(_make_category(), 'Alpha', '10.00', stock=0)
+    product = make_product(name='Alpha', price='10.00', stock=0)
     cart.add(product.pk, 2)
 
     result = update_cart_quantity(cart, product, 2)
@@ -221,7 +207,7 @@ def test_update_cart_quantity_removes_out_of_stock_line() -> None:
 @pytest.mark.django_db
 def test_update_cart_quantity_missing_line_is_rejected() -> None:
     cart = Cart(_FakeSession())
-    product = _make_product(_make_category(), 'Alpha', '10.00')
+    product = make_product(name='Alpha', price='10.00')
 
     result = update_cart_quantity(cart, product, 2)
 
@@ -232,7 +218,7 @@ def test_update_cart_quantity_missing_line_is_rejected() -> None:
 @pytest.mark.django_db
 def test_remove_from_cart_drops_line() -> None:
     cart = Cart(_FakeSession())
-    product = _make_product(_make_category(), 'Alpha', '10.00')
+    product = make_product(name='Alpha', price='10.00')
     cart.add(product.pk, 3)
 
     remove_from_cart(cart, product)

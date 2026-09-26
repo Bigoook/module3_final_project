@@ -9,7 +9,7 @@ from apps.catalog.models import Product
 from apps.catalog.selectors import (
     can_submit_review,
     get_product_detail_by_slug,
-    get_related_products,
+    get_product_page_context,
 )
 from apps.orders.forms import AddToCartForm
 from apps.reviews.forms import ReviewForm
@@ -36,9 +36,7 @@ class ReviewCreateView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         product = self.get_product()
         context['product'] = product
-        context['reviews'] = list(product.reviews.all())
-        context['related_products'] = get_related_products(product)
-        context['can_review'] = can_submit_review(self.request.user, product)
+        context.update(get_product_page_context(product, self.request.user))
         context['review_form'] = context['form']
         context['cart_form'] = AddToCartForm()
         return context
