@@ -38,6 +38,10 @@ jobs:
           with:
             python-version: "3.12"
         - run: pip install -r requirements-dev.txt
+        - name: Install gettext
+          run: sudo apt-get update && sudo apt-get install -y gettext
+        - name: Compile translations
+          run: python manage.py compilemessages --locale uk
         - run: ruff check .
         - run: mypy .
         - run: pytest .

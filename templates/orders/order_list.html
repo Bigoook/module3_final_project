@@ -1,30 +1,30 @@
 {% extends "base.html" %}
-{% load shop_tags %}
+{% load shop_tags i18n %}
 
-{% block title %}My Orders{% endblock %}
+{% block title %}{% translate "My Orders" %}{% endblock %}
 
 {% block content %}
 <main class="account-page-wrapper">
     <div class="account-container">
-        <h1 class="account-form-title">Order History</h1>
+        <h1 class="account-form-title">{% translate "Order History" %}</h1>
 
         <form method="get" action="{% url 'orders:order_list' %}" class="order-status-filter">
-            <label for="order-status-select">Status</label>
+            <label for="order-status-select">{% translate "Status" %}</label>
             <select name="status" id="order-status-select" onchange="this.form.submit()">
-                <option value="" {% if not current_status %}selected{% endif %}>All statuses</option>
+                <option value="" {% if not current_status %}selected{% endif %}>{% translate "All statuses" %}</option>
                 {% for value, label in statuses %}
                     <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
-            <noscript><button type="submit" class="button button--secondary">Filter</button></noscript>
+            <noscript><button type="submit" class="button button--secondary">{% translate "Filter" %}</button></noscript>
         </form>
 
         {% if orders %}
             <div class="order-history-table">
                 <div class="order-table-header">
-                    <div class="order-table-cell">Order Details</div>
-                    <div class="order-table-cell">Order Status</div>
-                    <div class="order-table-cell">Total</div>
+                    <div class="order-table-cell">{% translate "Order Details" %}</div>
+                    <div class="order-table-cell">{% translate "Order Status" %}</div>
+                    <div class="order-table-cell">{% translate "Total" %}</div>
                 </div>
                 <div class="order-table-body">
                     {% for order in orders %}
@@ -45,7 +45,7 @@
             </div>
             {% include "partials/pagination.html" %}
         {% else %}
-            <p class="empty-state">You have no orders yet.</p>
+            <p class="empty-state">{% translate "You have no orders yet." %}</p>
         {% endif %}
     </div>
 </main>

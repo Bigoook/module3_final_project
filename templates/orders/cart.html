@@ -1,17 +1,17 @@
 {% extends "base.html" %}
-{% load shop_tags %}
+{% load shop_tags i18n %}
 
-{% block title %}Shopping Cart{% endblock %}
+{% block title %}{% translate "Shopping Cart" %}{% endblock %}
 
 {% block content %}
 <main class="cart-page-wrapper">
     <div class="cart-container">
-        <h1 class="cart-title">Shopping Cart</h1>
+        <h1 class="cart-title">{% translate "Shopping Cart" %}</h1>
 
         {% if is_empty %}
             <div class="empty-state">
-                <p>Your cart is empty.</p>
-                <a href="{% url 'catalog:product_list' %}" class="button button--primary">Browse products</a>
+                <p>{% translate "Your cart is empty." %}</p>
+                <a href="{% url 'catalog:product_list' %}" class="button button--primary">{% translate "Browse products" %}</a>
             </div>
         {% else %}
             <div class="cart-items-list">
@@ -27,23 +27,23 @@
                                 <h2 class="cart-item__name"><a href="{{ line.product.get_absolute_url }}">{{ line.product.name }}</a></h2>
                                 <div class="cart-item__price-info">
                                     <p class="cart-item__price">{{ line.line_total|money }}</p>
-                                    <span class="cart-item__price-tag">{{ line.product.price|money }} each</span>
+                                    <span class="cart-item__price-tag">{% blocktranslate with price=line.product.price|money %}{{ price }} each{% endblocktranslate %}</span>
                                 </div>
                             </div>
                             <div class="cart-item__actions">
                                 <form method="post" action="{% url 'orders:cart_update' line.product.id %}" class="cart-item__quantity-form">
                                     {% csrf_token %}
                                     <div class="cart-item__quantity-selector" data-quantity-control>
-                                        <button type="button" class="quantity-btn-cart" data-action="decrease" aria-label="Decrease quantity"><i class="fa-solid fa-minus"></i></button>
+                                        <button type="button" class="quantity-btn-cart" data-action="decrease" aria-label="{% translate 'Decrease quantity' %}"><i class="fa-solid fa-minus"></i></button>
                                         <input type="number" name="quantity" min="1" value="{{ line.quantity }}" class="quantity-input">
-                                        <button type="button" class="quantity-btn-cart" data-action="increase" aria-label="Increase quantity"><i class="fa-solid fa-plus"></i></button>
+                                        <button type="button" class="quantity-btn-cart" data-action="increase" aria-label="{% translate 'Increase quantity' %}"><i class="fa-solid fa-plus"></i></button>
                                     </div>
-                                    <button type="submit" class="button button--secondary">Update</button>
+                                    <button type="submit" class="button button--secondary">{% translate "Update" %}</button>
                                 </form>
                                 <form method="post" action="{% url 'orders:cart_remove' line.product.id %}">
                                     {% csrf_token %}
                                     <button type="submit" class="button--remove">
-                                        Remove <i class="fa-solid fa-xmark"></i>
+                                        {% translate "Remove" %} <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </form>
                             </div>
@@ -54,10 +54,10 @@
 
             <div class="cart-summary">
                 <div class="cart-summary__total">
-                    <p>Total</p>
+                    <p>{% translate "Total" %}</p>
                     <p>{{ total|money }}</p>
                 </div>
-                <a href="{% url 'orders:checkout' %}" class="button button--primary button--checkout">Proceed to Checkout</a>
+                <a href="{% url 'orders:checkout' %}" class="button button--primary button--checkout">{% translate "Proceed to Checkout" %}</a>
             </div>
         {% endif %}
     </div>

@@ -5,7 +5,8 @@ from django.contrib.auth import get_user_model
 from django.test import override_settings
 
 from apps.core.emailing import send_email, send_order_confirmation
-from apps.orders.models import Order
+from apps.factories import make_product
+from apps.orders.models import Order, OrderItem
 
 
 @pytest.fixture
@@ -70,3 +71,37 @@ def test_send_order_confirmation_sends_shop_copy_when_enabled(order) -> None:
     assert send.call_count == 2
     recipients = {call.kwargs['to'] for call in send.call_args_list}
     assert recipients == {'buyer@example.com', 'admin@example.com'}
+
+
+@pytest.mark.django_db
+@override_settings(SHOP_NAME='Test Brewery', SHOP_EMAIL='hello@test.example', SHOP_CURRENCY='USD')
+def test_order_confirmation_email_uses_shop_settings(order) -> None:
+    with override_settings(RESEND_API_KEY='re_123'):
+        with patch('apps.core.emailing.send_email') as send:
+            send_order_confirmation(order)
+
+    kwargs = send.call_args.kwargs
+    assert kwargs['subject'].startswith('Test Brewery — order #7')
+    assert '<title>Test Brewery — order #7</title>' in kwargs['html']
+    assert 'Test Brewery' in kwargs['html']
+    assert 'hello@test.example' in kwargs['html']
+    assert '{{' not in kwargs['html']
+
+
+@pytest.mark.django_db
+@override_settings(SHOP_CURRENCY='USD')
+def test_order_confirmation_email_formats_prices_with_currency(order) -> None:
+    order_item = OrderItem.objects.create(
+        order=order,
+        product=make_product(price='12.50'),
+        quantity=2,
+        price='12.50',
+    )
+
+    with override_settings(RESEND_API_KEY='re_123'):
+        with patch('apps.core.emailing.send_email') as send:
+            send_order_confirmation(order)
+
+    html = send.call_args.kwargs['html']
+    assert '$25.00' in html
+    assert str(order_item.subtotal) not in html

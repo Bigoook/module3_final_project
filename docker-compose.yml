@@ -16,6 +16,9 @@ services:
     build:
       dockerfile: ./Dockerfile
     env_file: .env.dev
+    environment:
+      # Demo products/orders so the storefront can be checked in both languages.
+      SEED_DATA: "${SEED_DATA:-1}"
     ports:
       - "8000:8000"
     volumes:

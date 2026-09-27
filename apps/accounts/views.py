@@ -16,6 +16,7 @@ from django.contrib.auth.views import (
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
 
@@ -49,7 +50,7 @@ class RegisterView(View):
                 password=form.cleaned_data['password1'],
             )
             login(request, user)
-            messages.success(request, f'Welcome, {user.username}!')
+            messages.success(request, _('Welcome, %(username)s!') % {'username': user.username})
             return redirect('catalog:home')
         return render(request, self.template_name, {'form': form})
 
@@ -66,7 +67,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         form = ProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Profile updated.')
+            messages.success(request, _('Profile updated.'))
             return redirect('accounts:profile')
         return self.render_to_response(self.get_context_data(form=form))
 

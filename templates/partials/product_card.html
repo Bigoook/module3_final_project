@@ -1,4 +1,4 @@
-{% load static shop_tags %}
+{% load static shop_tags i18n %}
 {# Expects: product (from a for_listing() queryset: category, price, rating_avg, rating_count, in_stock) #}
 <div class="product-card">
     <a href="{{ product.get_absolute_url }}" class="product-card__link-overlay" aria-label="{{ product.name }}"></a>
@@ -22,9 +22,9 @@
         </div>
         <p class="product-card__price">{{ product.price|money }}</p>
         {% if product.in_stock %}
-            <span class="badge badge--in-stock">In stock</span>
+            <span class="badge badge--in-stock">{% translate "In stock" %}</span>
         {% else %}
-            <span class="badge badge--out-of-stock">Out of stock</span>
+            <span class="badge badge--out-of-stock">{% translate "Out of stock" %}</span>
         {% endif %}
 
         {% if product.in_stock %}
@@ -33,7 +33,7 @@
                 <input type="hidden" name="quantity" value="1">
                 <button type="submit" class="button button--primary product-card__add-button">
                     <i class="fa-solid fa-cart-shopping"></i>
-                    <span>Add to Cart</span>
+                    <span>{% translate "Add to Cart" %}</span>
                 </button>
             </form>
         {% endif %}

@@ -5,7 +5,6 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.messages import ERROR
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from config.admin_site import shop_admin_site
@@ -21,14 +20,14 @@ class UserAdmin(DjangoUserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (
-            _('Personal info'),
+            'Personal info',
             {'fields': ('first_name', 'last_name', 'email', 'phone', 'default_address')},
         ),
         (
-            _('Permissions'),
+            'Permissions',
             {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')},
         ),
-        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     actions = ('issue_api_token',)
 
