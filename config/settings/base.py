@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
                 'apps.core.context_processors.main_context',
             ],
         },
@@ -117,8 +118,6 @@ LANGUAGES = [
     ('en', 'English'),
     ('uk', 'Українська'),
 ]
-LANGUAGE_COOKIE_AGE = 60 * 60 * 24 * 365
-LANGUAGE_COOKIE_SAMESITE = 'Lax'
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']

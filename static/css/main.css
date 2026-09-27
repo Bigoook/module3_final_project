@@ -155,6 +155,39 @@ header {
     border-color: var(--dark-green);
 }
 
+/*
+========================================
+    Header: language switch
+========================================
+*/
+.header__lang-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header__lang-switch-link {
+    padding: 6px 10px;
+    border: 1px solid var(--border-dark-grey);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--black-main);
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.header__lang-switch-link:hover {
+    background-color: var(--slate-200);
+}
+
+.header__lang-switch-link.is-active {
+    background-color: var(--green);
+    border-color: var(--green);
+    color: var(--white-text);
+}
+
 /* Hero Banner */
 .hero-banner {
     position: relative;
