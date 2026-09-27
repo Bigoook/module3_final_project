@@ -37,15 +37,14 @@ def test_home_renders_best_sellers_section() -> None:
 
 
 @pytest.mark.django_db
-def test_home_header_lists_child_categories() -> None:
+def test_home_header_has_no_category_links() -> None:
     parent = make_category('Malts', 'malts')
     Category.objects.create(name='Base Malts', slug='base-malts', parent=parent)
 
     response = Client().get('/')
 
     assert response.status_code == 200
-    assert b'Malts' in response.content
-    assert b'Base Malts' in response.content
+    assert b'>Categories<' not in response.content
 
 
 @pytest.mark.django_db

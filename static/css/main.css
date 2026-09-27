@@ -2057,45 +2057,6 @@ footer {
     text-align: center;
 }
 
-.header__nav-dropdown {
-    position: relative;
-}
-
-.header__nav-dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    min-width: 180px;
-    background-color: var(--background-grey);
-    border: 1px solid var(--border-default);
-    border-radius: 8px;
-    box-shadow: 0 5px 15px var(--black-200);
-    list-style: none;
-    margin: 8px 0 0;
-    padding: 8px;
-    z-index: 1010;
-}
-
-.header__nav-dropdown-menu::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 0;
-    right: 0;
-    height: 8px;
-}
-
-.header__nav-dropdown:hover .header__nav-dropdown-menu,
-.header__nav-dropdown:focus-within .header__nav-dropdown-menu {
-    display: block;
-}
-
-.header__nav-dropdown-menu li a {
-    display: block;
-    padding: 8px 12px;
-}
-
 /*
 ========================================
     Alerts (Django messages framework)
@@ -2528,26 +2489,4 @@ footer {
 
 .messages-container {
     padding-top: 16px;
-}
-
-.header__nav .header__nav-dropdown-menu {
-    display: none;
-    width: auto;
-    flex-direction: column;
-    align-items: stretch;
-}
-
-.header__nav .header__nav-dropdown:hover .header__nav-dropdown-menu,
-.header__nav .header__nav-dropdown:focus-within .header__nav-dropdown-menu {
-    display: block;
-}
-
-.header__nav .header__nav-dropdown-menu .header__nav-dropdown-child a {
-    padding-left: 24px;
-}
-
-.header__nav .header__nav-dropdown-menu li a:hover {
-    background-color: var(--green);
-    color: var(--white-text);
-    border-radius: 4px;
 }
