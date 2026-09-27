@@ -1,14 +1,15 @@
 {% load static %}
+{% load i18n %}
 <footer>
-    <img src="{% static 'img/background/image-footer.svg' %}" alt="{{ SHOP_NAME }} Hops Logo" class="footer__hops-logo">
+    <img src="{% static 'img/background/image-footer.svg' %}" alt="{% blocktranslate with shop=SHOP_NAME %}{{ shop }} logo{% endblocktranslate %}" class="footer__hops-logo">
     <nav class="footer__nav">
         <ul>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Community</a></li>
-            <li><a href="#">Resources</a></li>
-            <li><a href="#">License</a></li>
+            <li><a href="#">{% translate "Contact" %}</a></li>
+            <li><a href="#">{% translate "FAQ" %}</a></li>
+            <li><a href="#">{% translate "Community" %}</a></li>
+            <li><a href="#">{% translate "Resources" %}</a></li>
+            <li><a href="#">{% translate "License" %}</a></li>
         </ul>
     </nav>
-    <p class="footer__copyright">&copy; {{ SHOP_NAME }} {% now "Y" %}. All rights reserved</p>
+    <p class="footer__copyright">&copy; {{ SHOP_NAME }} {% now "Y" %}. {% translate "All rights reserved" %}</p>
 </footer>

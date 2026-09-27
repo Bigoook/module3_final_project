@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static shop_tags %}
+{% load static shop_tags i18n %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
@@ -27,12 +27,12 @@
                     </div>
                     <div class="product-card__rating">
                         {% stars product.rating_avg %}
-                        <span class="product-card__rating-count">({{ product.rating_count|default:0 }} reviews)</span>
+                        <span class="product-card__rating-count">{% blocktranslate count counter=product.rating_count|default:0 %}({{ counter }} review){% plural %}({{ counter }} reviews){% endblocktranslate %}</span>
                     </div>
                     {% if product.in_stock %}
-                        <span class="badge badge--in-stock">In stock ({{ product.stock }})</span>
+                        <span class="badge badge--in-stock">{% blocktranslate with stock=product.stock %}In stock ({{ stock }}){% endblocktranslate %}</span>
                     {% else %}
-                        <span class="badge badge--out-of-stock">Out of stock</span>
+                        <span class="badge badge--out-of-stock">{% translate "Out of stock" %}</span>
                     {% endif %}
                 </div>
                 <div class="product-description">
@@ -44,28 +44,28 @@
                             {% csrf_token %}
                             {% include "partials/form_errors.html" with form=cart_form %}
                             <div class="quantity-counter" data-quantity-control>
-                                <button type="button" class="quantity-btn" data-action="decrease" aria-label="Decrease quantity">
+                                <button type="button" class="quantity-btn" data-action="decrease" aria-label="{% translate 'Decrease quantity' %}">
                                     <i class="fa-solid fa-minus"></i>
                                 </button>
                                 <input type="number" name="quantity" min="1" value="{{ cart_form.quantity.value|default:1 }}" class="quantity-input">
-                                <button type="button" class="quantity-btn" data-action="increase" aria-label="Increase quantity">
+                                <button type="button" class="quantity-btn" data-action="increase" aria-label="{% translate 'Increase quantity' %}">
                                     <i class="fa-solid fa-plus"></i>
                                 </button>
                             </div>
                             <button type="submit" class="button button--primary add-to-cart-button">
                                 <i class="fa-solid fa-cart-shopping"></i>
-                                <span>Add to Cart</span>
+                                <span>{% translate "Add to Cart" %}</span>
                             </button>
                         </form>
                     {% else %}
-                        <button class="button button--primary add-to-cart-button" disabled>Out of stock</button>
+                        <button class="button button--primary add-to-cart-button" disabled>{% translate "Out of stock" %}</button>
                     {% endif %}
                 </div>
             </div>
         </section>
 
         <section class="reviews-section">
-            <h2 class="reviews-title">Latest reviews</h2>
+            <h2 class="reviews-title">{% translate "Latest reviews" %}</h2>
 
             {% if reviews %}
                 <div class="reviews-grid">
@@ -83,7 +83,7 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <p class="empty-state">No reviews yet. Be the first to share your experience.</p>
+                <p class="empty-state">{% translate "No reviews yet. Be the first to share your experience." %}</p>
             {% endif %}
 
             {% if can_review %}
@@ -91,7 +91,7 @@
                     {% csrf_token %}
                     {% include "partials/form_errors.html" with form=review_form %}
                     <div class="review-form__field">
-                        <span class="review-form__label">Your rating</span>
+                        <span class="review-form__label">{% translate "Your rating" %}</span>
                         <div class="review-form__rating">
                             {% for radio in review_form.rating %}
                                 <label class="review-form__rating-option">
@@ -101,21 +101,21 @@
                         </div>
                     </div>
                     <div class="review-form__field">
-                        <label for="{{ review_form.comment.id_for_label }}">Comment</label>
+                        <label for="{{ review_form.comment.id_for_label }}">{% translate "Comment" %}</label>
                         <textarea id="{{ review_form.comment.id_for_label }}" name="{{ review_form.comment.html_name }}" class="Textarea" rows="3">{{ review_form.comment.value|default:'' }}</textarea>
                     </div>
-                    <button type="submit" class="button button--primary">Submit review</button>
+                    <button type="submit" class="button button--primary">{% translate "Submit review" %}</button>
                 </form>
             {% elif not user.is_authenticated %}
                 <p class="review-form__login-prompt">
-                    <a href="{% url 'accounts:login' %}?next={{ request.path }}">Sign in</a> to leave a review after your order is delivered.
+                    <a href="{% url 'accounts:login' %}?next={{ request.path }}">{% translate "Sign in" %}</a>{% translate " to leave a review after your order is delivered." %}
                 </p>
             {% endif %}
         </section>
 
         {% if related_products %}
         <section class="related-products">
-            <h2 class="reviews-title">You may also like</h2>
+            <h2 class="reviews-title">{% translate "You may also like" %}</h2>
             <div class="product-grid">
                 {% for related in related_products %}
                     {% include "partials/product_card.html" with product=related %}

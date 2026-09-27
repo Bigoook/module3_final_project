@@ -1,39 +1,39 @@
 {% extends "base.html" %}
-{% load shop_tags %}
+{% load shop_tags i18n %}
 
-{% block title %}Checkout{% endblock %}
+{% block title %}{% translate "Checkout" %}{% endblock %}
 
 {% block content %}
 <main class="checkout-page-wrapper">
     <div class="checkout-container">
-        <h1 class="checkout-title">Order Details</h1>
+        <h1 class="checkout-title">{% translate "Order Details" %}</h1>
 
         <form method="post" action="{% url 'orders:checkout' %}">
             {% csrf_token %}
             {% include "partials/form_errors.html" with form=form %}
 
             <section class="checkout-section">
-                <h2 class="checkout-section__title">Shipping information</h2>
+                <h2 class="checkout-section__title">{% translate "Shipping information" %}</h2>
                 <div class="checkout-form-group">
-                    <label for="{{ form.full_name.id_for_label }}">Full Name</label>
+                    <label for="{{ form.full_name.id_for_label }}">{% translate "Full Name" %}</label>
                     <input type="text" id="{{ form.full_name.id_for_label }}" name="{{ form.full_name.html_name }}" value="{{ form.full_name.value|default:'' }}" class="Input{% if form.full_name.errors %} is-invalid{% endif %}" required>
                 </div>
                 <div class="checkout-form-group">
-                    <label for="{{ form.email.id_for_label }}">Email</label>
+                    <label for="{{ form.email.id_for_label }}">{% translate "Email" %}</label>
                     <input type="email" id="{{ form.email.id_for_label }}" name="{{ form.email.html_name }}" value="{{ form.email.value|default:'' }}" class="Input{% if form.email.errors %} is-invalid{% endif %}" required>
                 </div>
                 <div class="checkout-form-group">
-                    <label for="{{ form.phone.id_for_label }}">Phone number</label>
+                    <label for="{{ form.phone.id_for_label }}">{% translate "Phone number" %}</label>
                     <input type="tel" id="{{ form.phone.id_for_label }}" name="{{ form.phone.html_name }}" value="{{ form.phone.value|default:'' }}" class="Input{% if form.phone.errors %} is-invalid{% endif %}" required>
                 </div>
                 <div class="checkout-form-group">
-                    <label for="{{ form.shipping_address.id_for_label }}">Shipping address</label>
+                    <label for="{{ form.shipping_address.id_for_label }}">{% translate "Shipping address" %}</label>
                     <textarea id="{{ form.shipping_address.id_for_label }}" name="{{ form.shipping_address.html_name }}" class="Textarea{% if form.shipping_address.errors %} is-invalid{% endif %}" rows="3" required>{{ form.shipping_address.value|default:'' }}</textarea>
                 </div>
             </section>
 
             <section class="checkout-section">
-                <h2 class="checkout-section__title">Payment Method</h2>
+                <h2 class="checkout-section__title">{% translate "Payment Method" %}</h2>
                 <div class="payment-options">
                     {% for radio in form.payment_method %}
                         <label class="radio-option">
@@ -46,7 +46,7 @@
             </section>
 
             <section class="checkout-summary">
-                <h2 class="checkout-section__title">Order Summary</h2>
+                <h2 class="checkout-section__title">{% translate "Order Summary" %}</h2>
                 <div class="order-summary-lines">
                     {% for line in lines %}
                         <div class="order-summary-line">
@@ -57,10 +57,10 @@
                 </div>
                 <div class="summary-details">
                     <div class="summary-total">
-                        <p>Total</p>
+                        <p>{% translate "Total" %}</p>
                         <p>{{ total|money }}</p>
                     </div>
-                    <button type="submit" class="button button--primary button--pay">Place order</button>
+                    <button type="submit" class="button button--primary button--pay">{% translate "Place order" %}</button>
                 </div>
             </section>
         </form>

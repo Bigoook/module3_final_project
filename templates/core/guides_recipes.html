@@ -1,19 +1,20 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Guides &amp; Recipes{% endblock %}
+{% block title %}{% translate "Guides &amp; Recipes" %}{% endblock %}
 
 {% block content %}
 <main class="static-page-wrapper">
     <div class="container">
         <div class="static-page-content">
-            <h1 class="static-page-title">Guides &amp; Recipes</h1>
-            <p class="static-page-subtitle">Coming Soon!</p>
+            <h1 class="static-page-title">{% translate "Guides &amp; Recipes" %}</h1>
+            <p class="static-page-subtitle">{% translate "Coming Soon!" %}</p>
             <div class="static-page-text">
-                <p>We are working hard to bring you the best guides and tested recipes from the world of homebrewing.</p>
-                <p>Here you will find everything from beginner's guides on your first brew to advanced techniques for experienced brewers, as well as a collection of recipes for various beer styles using our products.</p>
-                <p>Stay tuned for updates!</p>
+                <p>{% translate "We are working hard to bring you the best guides and tested recipes from the world of homebrewing." %}</p>
+                <p>{% translate "Here you will find everything from beginner's guides on your first brew to advanced techniques for experienced brewers, as well as a collection of recipes for various beer styles using our products." %}</p>
+                <p>{% translate "Stay tuned for updates!" %}</p>
             </div>
-            <a href="{% url 'catalog:product_list' %}" class="button button--primary">Back to Products</a>
+            <a href="{% url 'catalog:product_list' %}" class="button button--primary">{% translate "Back to Products" %}</a>
         </div>
     </div>
 </main>
