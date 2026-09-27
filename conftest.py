@@ -4,6 +4,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+from django.core.cache import cache
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
@@ -41,3 +42,13 @@ def _compiled_translations() -> None:
             call_command('compilemessages', locale=[locale], verbosity=0)
     except CommandError as exc:
         pytest.fail(f'compilemessages failed: {exc}')
+
+
+@pytest.fixture(autouse=True)
+def _reset_throttle_state() -> None:
+    """Drop rate-limit counters between tests.
+
+    DRF keeps throttle history in the cache, which is process-wide, so without
+    this a busy test could rate-limit the next one.
+    """
+    cache.clear()

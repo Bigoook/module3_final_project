@@ -4,10 +4,27 @@ import pytest
 from django.conf import settings
 from django.urls import reverse
 from rest_framework.test import APIClient
+from rest_framework.throttling import SimpleRateThrottle
 
 from apps.factories import make_product
 
 PASSWORD = 'Mega-Secret-2026!'
+
+
+@pytest.fixture
+def throttle_rates(monkeypatch: pytest.MonkeyPatch):
+    """Override DRF rate limits for one test.
+
+    `override_settings` does not work here: SimpleRateThrottle binds
+    THROTTLE_RATES as a class attribute at import time (rest_framework/throttling.py),
+    so the rates are frozen before any test runs.
+    """
+
+    def _apply(**rates: str) -> None:
+        merged = {**settings.REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'], **rates}
+        monkeypatch.setattr(SimpleRateThrottle, 'THROTTLE_RATES', merged)
+
+    return _apply
 
 
 def _register(client: APIClient, username: str = 'alice') -> int:
@@ -309,3 +326,55 @@ def test_review_create_list_and_permission_rules() -> None:
         == 401
     )
     assert guest.get(f'/api/products/{product.pk}/reviews/').status_code == 200
+
+
+@pytest.mark.django_db
+def test_registration_and_login_are_rate_limited(throttle_rates) -> None:
+    throttle_rates(register='2/hour', login='2/min')
+    client = APIClient()
+
+    for username in ('alice', 'bob'):
+        response = client.post(
+            reverse('api:user_register'),
+            {'username': username, 'email': f'{username}@example.com', 'password': PASSWORD},
+            format='json',
+        )
+        assert response.status_code == 201
+
+    blocked = client.post(
+        reverse('api:user_register'),
+        {'username': 'carol', 'email': 'carol@example.com', 'password': PASSWORD},
+        format='json',
+    )
+    assert blocked.status_code == 429
+    assert 'Retry-After' in blocked.headers
+
+    logged = APIClient()
+    for _ in range(2):
+        assert (
+            logged.post(
+                reverse('api:user_login'),
+                {'username': 'alice', 'password': PASSWORD},
+                format='json',
+            ).status_code
+            == 200
+        )
+
+    assert (
+        logged.post(
+            reverse('api:user_login'),
+            {'username': 'alice', 'password': 'wrong'},
+            format='json',
+        ).status_code
+        == 429
+    )
+
+
+@pytest.mark.django_db
+def test_browsing_endpoints_are_not_rate_limited_by_default() -> None:
+    """The default anon/user rates must stay above what a normal session needs."""
+    make_product(name='Pale malt', price='10.00', stock=5)
+    client = APIClient()
+
+    for _ in range(30):
+        assert client.get('/api/products/').status_code == 200

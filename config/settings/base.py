@@ -27,6 +27,15 @@ RESEND_FROM_EMAIL = env('RESEND_FROM_EMAIL', default='orders@example.com')
 # Admin copy of order confirmations; empty disables the copy.
 SHOP_EMAIL = env('SHOP_EMAIL', default='')
 
+# Reverse proxies (nginx/Caddy/Traefik) and their networks. X-Forwarded-For is
+# only honoured when the immediate peer is listed here, otherwise a client could
+# mint a fresh rate-limit bucket per request. Leave empty when there is no proxy.
+TRUSTED_PROXY_IPS = env.list('TRUSTED_PROXY_IPS', default=[])
+
+# Credential POSTs to the storefront and admin login, enforced by
+# apps.core.middleware.LoginThrottleMiddleware.
+LOGIN_ATTEMPT_RATE = env('LOGIN_ATTEMPT_RATE', default='10/min')
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -50,10 +59,16 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # csp.middleware.CSPMiddleware adds the header; keep it near the top so a
+    # redirect or error response still carries it.
+    'csp.middleware.CSPMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    # After CSRF on purpose: a request without a valid token is rejected before
+    # it can consume a rate-limit slot.
+    'apps.core.middleware.LoginThrottleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -131,12 +146,56 @@ REST_FRAMEWORK: dict[str, Any] = {
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # Rate limits, tunable per environment. Views opt into a stricter scope with
+    # `throttle_scope` (see apps/api/views.py); ScopedRateThrottle ignores views
+    # without a scope, so listing it here is safe.
+    'DEFAULT_THROTTLE_CLASSES': (
+        # Client-IP aware subclasses: behind a reverse proxy the stock throttles
+        # would key on the proxy address and share one bucket between all users.
+        'apps.core.throttling.ClientIpAnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'apps.core.throttling.ClientIpScopedRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': env('DRF_THROTTLE_ANON', default='120/min'),
+        'user': env('DRF_THROTTLE_USER', default='600/min'),
+        'login': env('DRF_THROTTLE_LOGIN', default='10/min'),
+        'register': env('DRF_THROTTLE_REGISTER', default='20/hour'),
+    },
     'PAGE_SIZE': 12,
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}
+
+# --- Content Security Policy -------------------------------------------------
+# django-csp 4.0 configures the policy through a single settings dict.
+# It lives in base.py rather than prod.py so violations surface in development
+# too. The third-party origins and the inline-style exception are deliberate:
+# Google Fonts and FontAwesome load from CDNs, and several templates set style
+# attributes inline. script-src stays strict — no inline handlers, no eval.
+CONTENT_SECURITY_POLICY = {
+    'DIRECTIVES': {
+        'default-src': ["'self'"],
+        'script-src': ["'self'"],
+        'style-src': [
+            "'self'",
+            "'unsafe-inline'",
+            'https://fonts.googleapis.com',
+            'https://cdnjs.cloudflare.com',
+        ],
+        'font-src': ["'self'", 'https://fonts.gstatic.com'],
+        'img-src': ["'self'", 'data:'],
+        'object-src': ["'none'"],
+        'base-uri': ["'self'"],
+        'form-action': ["'self'"],
+        'frame-ancestors': ["'none'"],
+    },
+    # Django admin ships three inline <script> blocks of its own, so it is
+    # excluded instead of weakening script-src for the whole site.
+    'EXCLUDE_URL_PREFIXES': ['/admin'],
 }
 
 SPECTACULAR_SETTINGS = {

@@ -6,6 +6,7 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.api.serializers import (
     CartLineSerializer,
@@ -150,10 +151,23 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    """JWT login with the shared `login` rate limit, so password guessing is capped."""
+
+    throttle_scope = 'login'
+
+
+class ThrottledTokenRefreshView(TokenRefreshView):
+    """Token refresh shares the `login` limit: it is an unauthenticated endpoint too."""
+
+    throttle_scope = 'login'
+
+
 class RegisterView(APIView):
     """Create a user account."""
 
     permission_classes = (AllowAny,)
+    throttle_scope = 'register'
 
     @extend_schema(summary='Register a user', request=RegisterSerializer, responses={201: UserSerializer})
     def post(self, request):

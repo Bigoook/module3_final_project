@@ -10,7 +10,7 @@
 
         <form method="get" action="{% url 'orders:order_list' %}" class="order-status-filter">
             <label for="order-status-select">{% translate "Status" %}</label>
-            <select name="status" id="order-status-select" onchange="this.form.submit()">
+            <select name="status" id="order-status-select" data-submit-on-change>
                 <option value="" {% if not current_status %}selected{% endif %}>{% translate "All statuses" %}</option>
                 {% for value, label in statuses %}
                     <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>

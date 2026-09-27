@@ -226,3 +226,4 @@ local_docs/
 # Env files: keep only the example in the repo
 .env.*
 !.env.example
+!.env.prod.example

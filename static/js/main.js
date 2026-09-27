@@ -37,4 +37,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // --- Order history status filter: submit the GET form on change. Lives in
+    // JS rather than an onchange attribute so that script-src can stay strict
+    // (no 'unsafe-inline' in the Content-Security-Policy).
+    document.querySelectorAll('[data-submit-on-change]').forEach(function (select) {
+        select.addEventListener('change', function () {
+            var form = this.closest('form');
+            if (form) {
+                form.submit();
+            }
+        });
+    });
+
 });
