@@ -3,12 +3,13 @@ from django.conf.urls.static import static
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from apps.core.views import health
+from apps.core.views import GuidesRecipesView, health
 from config.admin_site import shop_admin_site
 
 urlpatterns = [
     path('admin/', shop_admin_site.urls),
     path('health/', health, name='health'),
+    path('guides-recipes/', GuidesRecipesView.as_view(), name='guides_recipes'),
     path('api/', include('apps.api.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='api_schema'),
     path(
