@@ -23,6 +23,36 @@
 - Двомовність: EN (за замовчуванням) і UA через префікс URL.
 - Пошта: лист про замовлення користувачу й копія магазину через Resend.
 
+## Мови та URL
+
+Магазин двомовний: **EN** (за замовчуванням) і **UA**. Мова визначається префіксом URL:
+
+| Сторінка | English | Українська |
+| --- | --- | --- |
+| Головна | `/` | `/uk/` |
+| Продукти | `/products/` | `/uk/products/` |
+| Категорія | `/category/<slug>/` | `/uk/category/<slug>/` |
+| Картка продукту | `/products/<slug>/` | `/uk/products/<slug>/` |
+| Кошик | `/cart/` | `/uk/cart/` |
+| Оформлення | `/checkout/` | `/uk/checkout/` |
+| Мої замовлення | `/orders/` | `/uk/orders/` |
+| Вхід | `/login/` | `/uk/login/` |
+| Реєстрація | `/register/` | `/uk/register/` |
+| Профіль | `/account/` | `/uk/account/` |
+| Зміна пароля | `/account/password/` | `/uk/account/password/` |
+
+Технічні ендпоїнти лишаються без мовного префікса:
+
+| Ендпоїнт | URL |
+| --- | --- |
+| Адмінка | `/admin/` |
+| Перевірка стану | `/health/` |
+| REST API | `/api/` |
+| Схема OpenAPI | `/api/schema/` |
+| Документація Swagger | `/api/docs/` |
+
+Перемикач `EN | UA` у шапці зберігає поточну сторінку та query string.
+
 ## Технології
 
 | Шар | Технології |
@@ -88,37 +118,109 @@ docker compose up -d --build
 
 Потрібні Python 3.12, PostgreSQL та gettext.
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt -r requirements-dev.txt
+1. Забрати код з GitHub:
 
-# gettext має бути у PATH (Windows)
-$env:PATH = "C:\Program Files\gettext-iconv\bin;$env:PATH"
+   ```bash
+   git clone git@github.com:Bigoook/module3_final_project.git
+   cd module3_final_project
+   ```
 
-# Локальні налаштування
-copy .env.example .env.local
-# заповнити DATABASE_URL, SECRET_KEY тощо
+2. Створити віртуальне оточення й встановити залежності:
 
-python manage.py migrate
-python manage.py compilemessages -l uk
-python manage.py runserver
-```
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   pip install -r requirements.txt -r requirements-dev.txt
+   ```
+
+3. Налаштувати оточення:
+
+   ```powershell
+   # gettext має бути у PATH (Windows)
+   $env:PATH = "C:\Program Files\gettext-iconv\bin;$env:PATH"
+
+   # Локальні налаштування
+   copy .env.example .env.local
+   # заповнити DATABASE_URL, SECRET_KEY тощо
+   ```
+
+4. Приготувати базу й переклади:
+
+   ```powershell
+   python manage.py migrate
+   python manage.py compilemessages -l uk
+   ```
+
+5. Заповнити демо-даними (опційно). Сівання виконується вручну — локально воно не
+   автоматичне, на відміну від Docker dev, де `SEED_DATA=1`:
+
+   ```powershell
+   python manage.py seed_data      # демо-товари, користувачі, відгуки
+   python manage.py setup_roles    # ролі для адмінки
+   ```
+
+6. Запустити сервер:
+
+   ```powershell
+   python manage.py runserver
+   ```
 
 ### Продакшн
 
-```powershell
-copy .env.prod.example .env.prod
-# заповнити SECRET_KEY, ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS, DATABASE_URL,
-# POSTGRES_*, RESEND_API_KEY, TRUSTED_PROXY_IPS, CACHE_DIR; SEED_DATA=0
+Потрібен чистий Linux-сервер із Docker. Прод-стенд запускає gunicorn за тим самим
+`Dockerfile`, що й dev, але з `docker-compose.prod.yml` (`command:`, а не `CMD` у образі) —
+тож локальна розробка з `runserver` і autoreload не зачіпається. Статику віддає
+WhiteNoise, міграції й `collectstatic` виконує `docker-entrypoint.sh`.
 
-docker compose -f docker-compose.prod.yml up -d --build
-```
+1. Встановити Docker і Docker Compose:
 
-Прод-стенд запускає gunicorn за тим самим `Dockerfile`, що й dev, але з
-`docker-compose.prod.yml` (`command:`, а не `CMD` у образі) — тож локальна розробка
-з `runserver` і autoreload не зачіпається. Статику віддає WhiteNoise, міграції й
-`collectstatic` виконує `docker-entrypoint.sh`.
+   ```bash
+   sudo apt update
+   sudo apt install -y docker.io docker-compose-plugin
+   sudo usermod -aG docker $USER
+   newgrp docker
+   ```
+
+2. Забрати код на сервер. 
+
+   ```bash
+   git clone git@github.com:Bigoook/module3_final_project.git
+   cd module3_final_project
+   ```
+
+3. Створити `.env.prod` і заповнити реальними значеннями:
+
+   ```bash
+   cp .env.prod.example .env.prod
+
+   Згенерувати `SECRET_KEY` (будь-які 50+ випадкових символів):
+
+   ```bash
+   openssl rand -base64 50
+   ```
+
+4. Підняти стек (міграції, переклади й `collectstatic` виконує `docker-entrypoint.sh`):
+
+   ```bash
+   docker compose -f docker-compose.prod.yml up -d --build
+   ```
+
+5. Перевірити:
+
+   ```bash
+   docker compose -f docker-compose.prod.yml ps       # db healthy, web running
+   curl http://127.0.0.1:8000/health/                 # 200
+   docker compose -f docker-compose.prod.yml logs -f web
+   ```
+
+6. Створити суперкористувача (бо `SEED_DATA=0`, демо-адміна немає):
+
+   ```bash
+   docker compose -f docker-compose.prod.yml exec web python manage.py createsuperuser
+   ```
+
+7. Поставити проксі з TLS перед `127.0.0.1:8000` (nginx/Caddy). Django сам сертифікати
+   не бере — без проксі сайт недоступний ззовні, а HTTPS-налаштування не спрацюють.
 
 ## Приклади використання API
 
@@ -241,53 +343,6 @@ curl -X POST http://127.0.0.1:8000/api/products/1/reviews/ \
 
 Swagger/OpenAPI доступний на `/api/docs/`, схема — `/api/schema/`.
 
-## Команди для тестів та лінтерів
-
-```powershell
-# Тести
-.\.venv\Scripts\python.exe -m pytest -q
-
-# Лінтер і форматування
-.\.venv\Scripts\ruff.exe check .
-.\.venv\Scripts\ruff.exe format --check .
-
-# Перевірка типів
-.\.venv\Scripts\python.exe -m mypy .
-
-# Покриття тестами
-.\.venv\Scripts\python.exe -m pytest --cov=apps --cov-report=term-missing
-```
-
-Перевірка, що продакшен-налаштування безпечні (потрібні змінні з `.env.prod`):
-
-```powershell
-$env:DJANGO_SETTINGS_MODULE='config.settings.prod'
-# Тимчасовий ключ лише для перевірки: 50+ символів, інакше Django видасть security.W009
-$env:SECRET_KEY='check-only-7fK2mQ9xL4nR8tY6wB3cH5jF1sD0gA2eU7iO9mKqVxZ4pJ6hG1'
-$env:ALLOWED_HOSTS='shop.example.com'
-$env:DATABASE_URL='postgres://postgres:postgres@localhost:5432/final3'
-.\.venv\Scripts\python.exe manage.py check --deploy
-```
-
-## Робота з перекладами
-
-Джерельні рядки — англійською; переклади — у `locale/uk/LC_MESSAGES/django.po`.
-
-```powershell
-# gettext має бути у PATH (Windows)
-$env:PATH = "C:\Program Files\gettext-iconv\bin;$env:PATH"
-
-.\.venv\Scripts\python.exe manage.py makemessages -l uk
-# ...заповнити msgstr у django.po...
-.\.venv\Scripts\python.exe manage.py compilemessages -l uk
-```
-
-- `*.mo` у `.gitignore`, тому `compilemessages` треба виконувати після deploy/оновлення — інакше зміни не видно. Потрібен пакет **gettext** (`msgfmt`): у CI та в `docker-entrypoint.sh` він встановлюється/компілюється автоматично, а `conftest.py` перед тестами збирає `.mo`, якщо вони застаріли або відсутні.
-- Нові рядки: `{% translate %}` / `{% blocktranslate %}` у шаблонах, `gettext` / `gettext_lazy` у Python; інтерполяція — лише іменовані плейсхолдери `%(name)s`.
-- Назви товарів і категорій — дані БД, вони лишаються англійською в обох мовах.
-- Листи про замовлення рендеряться без request, тому за замовчуванням надсилаються англійською; щоб додати іншу мову листа, потрібно зберігати мову користувача і активувати її через `translation.override`.
-- **Адмінка (`/admin/`) — тільки англійською.** Вона не має мовного префіксу, тож `LocaleMiddleware` для неї завжди активує `LANGUAGE_CODE = 'en'`. Тому її рядки свідомо **не** обгорнуті в `gettext`/`{% translate %}` і не потрапляють у `django.po` — інакше в `.po` були б переклади, яких ніколи не видно. Якщо захочеш двомовну адмінку, спершу додай їй префікс мови, і тільки потім повертай переклади.
-
 ## Безпека
 
 ### Обмеження запитів API
@@ -344,63 +399,28 @@ DRF-throttle не бачать звичайні Django-в'юхи, тому `/acc
 - `/admin` виключено через `EXCLUDE_URL_PREFIXES`: Django admin містить три власні інлайн-`<script>`,
   тож або виключити його, або послабити `script-src` для всього сайту.
 
-## Деплой
+### Налаштування Resend (листи про замовлення)
 
-Прод побудований на тому ж `Dockerfile`, що й dev, але gunicorn стартує з `docker-compose.prod.yml`
-(`command:`, а не `CMD` у образі) — тож локальна розробка з `runserver` і autoreload не зачіпається.
+1. Зареєструйся на https://resend.com і створи API-ключ (Settings → API Keys).
+2. Підтверди домен у Resend і вкажи його в `RESEND_FROM_EMAIL`
+   (наприклад `orders@shop.example.com`). Без підтвердженого домена листи
+   не відимуться — крім тестового адреса `onboarding@resend.dev`, який надсилає
+   лише на email, з якого зареєстровано акаунт.
+3. У `.env.prod`:
 
-1. Підготувати оточення (значення — у `.env.prod.example`, файл `.env.prod` у git не потрапляє):
-
-   ```powershell
-   copy .env.prod.example .env.prod
-   python -c "from django.core.management.utils import get_random_secret_key as k; print(k())"  # → SECRET_KEY
+   ```env
+   RESEND_API_KEY=re_xxxxxxxxxxxx
+   RESEND_FROM_EMAIL=orders@shop.example.com
+   SHOP_EMAIL=shop@example.com   # копія магазину; порожнє = без копії
    ```
 
-2. Запустити стек (міграції, переклади й `collectstatic` виконує `docker-entrypoint.sh`):
+4. Перевірка: оформи замовлення й подивись лог — без ключа або з хибним доменом
+   у консолі буде warning від `apps/core/emailing.py`.
 
-   ```powershell
-   docker compose -f docker-compose.prod.yml up -d --build
-   ```
+`RESEND_FROM_EMAIL` має бути **підтвердженим відправником** у Resend, інакше API
+відповідає 422. Це найчастіша причина, чому «листів немає».
 
-3. Перевірити: `http://127.0.0.1:8000/health/` і журнал `docker compose -f docker-compose.prod.yml logs -f web`.
-
-**Образ публікується автоматично:** `.github/workflows/deploy.yml` збирає його й пушить у `ghcr.io` на
-кожен пуш у `main` (теги `main` і `sha`). Крок на сервері лишається ручним, щоб не тягнути SSH-доступи в CI:
-
-```bash
-docker compose -f docker-compose.prod.yml pull
-docker compose -f docker-compose.prod.yml up -d
-```
-
-**Перед продакшеном:**
-
-- проксі з TLS перед `127.0.0.1:8000` (Django сам сертифікати не бере); у `.env.prod` — `ALLOWED_HOSTS` і `CSRF_TRUSTED_ORIGINS` з реальним доменом;
-- `SEED_DATA=0` (інакше з'явиться `admin/admin12345`), `COLLECTSTATIC=1`;
-- `RESEND_API_KEY` — без нього листи про замовлення пропускаються, а не надсилаються;
-- бекапи БД: `pg_dump` у cron, бо `pgdata` живе у volume і зникає разом з `docker compose down -v`;
-- контейнер поки що під `root`. Non-root потребує окремого `Dockerfile.prod`: з `USER` у спільному образі
-  `docker-entrypoint.sh` втратить права писати `.mo` у `locale/`, а локальний dev з Linux bind-mounts може зламатись.
-
-## 9. Вимоги до здачі проєкту
-
-1. **Репозиторій на GitHub** — код доступний за адресою `github.com/Bigoook/module3_final_project`, використовуються гілки `main` + `feature/*`, історія комітів змістовна (8 комітів, PR #5, #6, #7).
-
-2. **README.md** (повний, згідно п. 2 ТЗ) — містить:
-   - опис проєкту;
-   - інструкції зі встановлення та запуску через Docker (`docker compose up -d --build`);
-   - приклади використання API з JWT (отримання токенів, `Authorization: Bearer`, оновлення);
-   - команди для запуску тестів і лінтерів;
-   - опис структури проєкту.
-
-3. (Опційно) Посилання на розгорнутий проєкт або відео-демонстрація — підготовлено: образ у `ghcr.io` + інструкція `docker compose -f docker-compose.prod.yml up -d`; потрібен реальний публічний URL.
-
-4. ПІБ, група, посилання на репозиторій — надіслано викладачеві (потрібно вставити дані).
-
-5. **Чек-ліст реалізації** — оформлений у розділі 10 з позначками `[x]` / `[ ]`.
-
-6. Історія комітів змістовна, гілки використовуються правильно (`feature/*` → `main` через PR).
-
-## 10. Чек-ліст перед здачею
+## 9. Чек-ліст перед здачею
 
 - [x] Проєкт запускається командою `docker compose up` на чистій системі
 - [x] Використовується PostgreSQL
@@ -418,13 +438,3 @@ docker compose -f docker-compose.prod.yml up -d
 - [x] README повний та зрозумілий
 - [x] Коміти змістовні, гілки використовуються правильно
 - [x] Цей чек-ліст додано до проєкту
-
-### Що лишилося незакритим
-
-- **ПІБ і група** не вказані (вимога 4).
-- **Публічне посилання на деплой** відсутнє (опційна вимога 3).
-- **`apps/payments/` — порожня заглушка** без моделей і view. Імітація способу оплати
-  реалізована полем `Order.payment_method`; окремий застосунок не використовується.
-- **Покриття тестів не вимірюється.** `pytest-cov` встановлено, але не налаштовано.
-- **GraphQL не реалізовано** (бонусний пункт, на оцінку не впливає).
-- **Контейнер prod працює під `root`.** Non-root потребує окремого `Dockerfile.prod`.
