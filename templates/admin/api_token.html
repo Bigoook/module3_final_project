@@ -1,17 +1,22 @@
 {% extends "admin/base_site.html" %}
+{% load i18n %}
 {% block content %}
 <div class="card">
     <p>
-        Freshly minted JWT tokens for <strong>{{ user.username }}</strong>.
-        Copy them now — the access token is shown only once here.
+        {% translate "Freshly minted JWT tokens for" %}
+        <strong>{{ user.username }}</strong>.
+        {% translate "Copy them now — the access token is shown only once here." %}
     </p>
-    <p class="quiet">Access token (valid for 30 minutes):</p>
+    <p class="quiet">{% translate "Access token (valid for 30 minutes):" %}</p>
     <textarea readonly rows="3" style="width: 100%;">{{ access }}</textarea>
-    <p class="quiet">Refresh token (valid for 7 days):</p>
+    <p class="quiet">{% translate "Refresh token (valid for 7 days):" %}</p>
     <textarea readonly rows="3" style="width: 100%;">{{ refresh }}</textarea>
     <p class="quiet">
-        Use the access token as <code>Authorization: Bearer &lt;access&gt;</code> for the API.
-        Refresh via <code>POST /api/users/refresh/</code> with the refresh token.
+        {% translate "Use the access token as" %}
+        <code>Authorization: Bearer &lt;access&gt;</code>
+        {% translate "for the API. Refresh via" %}
+        <code>POST /api/users/refresh/</code>
+        {% translate "with the refresh token." %}
     </p>
 </div>
 {% endblock %}

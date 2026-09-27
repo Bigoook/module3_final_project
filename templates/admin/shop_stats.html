@@ -1,5 +1,5 @@
 ﻿{% extends "admin/base_site.html" %}
-{% load shop_tags %}
+{% load shop_tags i18n %}
 
 {% block content %}
 <style>
@@ -30,40 +30,40 @@
 
 <div class="stats-grid">
     <dl class="stat-card">
-        <dt>Total revenue</dt>
+        <dt>{% translate "Total revenue" %}</dt>
         <dd>{{ statistics.total_revenue|money }}</dd>
     </dl>
     <dl class="stat-card">
-        <dt>Orders</dt>
+        <dt>{% translate "Orders" %}</dt>
         <dd>{{ statistics.order_count }}</dd>
     </dl>
     <dl class="stat-card">
-        <dt>Average check</dt>
+        <dt>{% translate "Average check" %}</dt>
         <dd>{{ statistics.average_check|money }}</dd>
     </dl>
     <dl class="stat-card">
-        <dt>Pending orders</dt>
+        <dt>{% translate "Pending orders" %}</dt>
         <dd>{{ statistics.pending_orders }}</dd>
     </dl>
     <dl class="stat-card">
-        <dt>Customers</dt>
+        <dt>{% translate "Customers" %}</dt>
         <dd>{{ statistics.user_count }}</dd>
     </dl>
     <dl class="stat-card">
-        <dt>Reviews</dt>
-        <dd>{{ statistics.review_count }} (avg {{ statistics.average_rating|floatformat:2 }})</dd>
+        <dt>{% translate "Reviews" %}</dt>
+        <dd>{% blocktranslate with count=statistics.review_count rating=statistics.average_rating|floatformat:2 %}{{ count }} (avg {{ rating }}){% endblocktranslate %}</dd>
     </dl>
 </div>
 
 <div class="stats-grid">
     <fieldset class="module aligned">
-        <h2>Top-selling products</h2>
+        <h2>{% translate "Top-selling products" %}</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Sold</th>
-                    <th>Revenue</th>
+                    <th>{% translate "Product" %}</th>
+                    <th>{% translate "Sold" %}</th>
+                    <th>{% translate "Revenue" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -74,19 +74,19 @@
                         <td>{{ row.revenue|money }}</td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="3">No sales yet.</td></tr>
+                    <tr><td colspan="3">{% translate "No sales yet." %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </fieldset>
 
     <fieldset class="module aligned">
-        <h2>Low stock (≤ {{ statistics.low_stock_threshold }})</h2>
+        <h2>{% blocktranslate with threshold=statistics.low_stock_threshold %}Low stock (≤ {{ threshold }}){% endblocktranslate %}</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Stock</th>
+                    <th>{% translate "Product" %}</th>
+                    <th>{% translate "Stock" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -96,20 +96,20 @@
                         <td>{{ product.stock }}</td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="2">No low-stock products.</td></tr>
+                    <tr><td colspan="2">{% translate "No low-stock products." %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </fieldset>
 
     <fieldset class="module aligned">
-        <h2>Orders — last 7 days</h2>
+        <h2>{% translate "Orders — last 7 days" %}</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Day</th>
-                    <th>Orders</th>
-                    <th>Revenue</th>
+                    <th>{% translate "Day" %}</th>
+                    <th>{% translate "Orders" %}</th>
+                    <th>{% translate "Revenue" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -120,12 +120,12 @@
                         <td>{{ row.revenue|money }}</td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="3">No orders in the last 7 days.</td></tr>
+                    <tr><td colspan="3">{% translate "No orders in the last 7 days." %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </fieldset>
 </div>
 
-<a href="{% url 'shop_admin:index' %}" class="button">Back to admin</a>
+<a href="{% url 'shop_admin:index' %}" class="button">{% translate "Back to admin" %}</a>
 {% endblock %}
