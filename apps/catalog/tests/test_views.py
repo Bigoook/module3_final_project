@@ -22,15 +22,29 @@ def test_home_renders_featured_products() -> None:
 
 
 @pytest.mark.django_db
-def test_home_header_lists_child_categories() -> None:
+def test_home_renders_best_sellers_section() -> None:
+    category = make_category()
+    product = make_product('Citra Hops', category)
+    user = get_user_model().objects.create_user(username='buyer')
+    order = Order.objects.create(user=user)
+    OrderItem.objects.create(order=order, product=product, quantity=2, price=product.price)
+
+    response = Client().get('/')
+
+    assert response.status_code == 200
+    assert b'Best sellers' in response.content
+    assert product.name.encode() in response.content
+
+
+@pytest.mark.django_db
+def test_home_header_has_no_category_links() -> None:
     parent = make_category('Malts', 'malts')
     Category.objects.create(name='Base Malts', slug='base-malts', parent=parent)
 
     response = Client().get('/')
 
     assert response.status_code == 200
-    assert b'Malts' in response.content
-    assert b'Base Malts' in response.content
+    assert b'>Categories<' not in response.content
 
 
 @pytest.mark.django_db
@@ -64,6 +78,47 @@ def test_product_list_respects_ordering_and_category() -> None:
 
     assert category_response.status_code == 200
     assert len(category_response.context['products']) == 2
+
+
+@pytest.mark.django_db
+def test_category_url_preselects_active_category_in_filter() -> None:
+    malts = make_category('Malts', 'malts')
+    make_product('A Malt', malts)
+
+    response = Client().get('/category/malts/')
+
+    assert response.status_code == 200
+    assert response.context['current_category_slug'] == 'malts'
+    assert b'value="malts" selected' in response.content
+    assert b'action="/category/malts/"' in response.content
+
+
+@pytest.mark.django_db
+def test_category_get_param_overrides_category_url() -> None:
+    malts = make_category('Malts', 'malts')
+    hops = make_category('Hops', 'hops')
+    make_product('A Malt', malts)
+    b = make_product('B Hop', hops)
+
+    response = Client().get('/category/malts/?category=hops')
+
+    assert response.status_code == 200
+    assert list(response.context['products']) == [b]
+    assert response.context['current_category_slug'] == 'hops'
+
+
+@pytest.mark.django_db
+def test_empty_category_param_on_category_url_shows_all_products() -> None:
+    malts = make_category('Malts', 'malts')
+    hops = make_category('Hops', 'hops')
+    a = make_product('A Malt', malts)
+    b = make_product('B Hop', hops)
+
+    response = Client().get('/category/malts/?category=')
+
+    assert response.status_code == 200
+    assert set(response.context['products']) == {a, b}
+    assert response.context['current_category_slug'] is None
 
 
 @pytest.mark.django_db

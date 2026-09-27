@@ -24,6 +24,20 @@
                 {% endfor %}
             </div>
         </section>
+
+        <section class="featured-section">
+            <div class="featured-section__header">
+                <h2 class="section-title">Best sellers</h2>
+                <a href="{% url 'catalog:product_list' %}?ordering=-sold" class="button button--secondary">View all products</a>
+            </div>
+            <div class="product-grid">
+                {% for product in best_sellers %}
+                    {% include "partials/product_card.html" with product=product %}
+                {% empty %}
+                    <p class="empty-state">No products sold yet.</p>
+                {% endfor %}
+            </div>
+        </section>
     </div>
 </main>
 {% endblock %}

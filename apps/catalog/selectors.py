@@ -1,9 +1,10 @@
 """Reusable query compositions shared by template views and the DRF API."""
 
-from typing import Any
+from typing import Any, Mapping
 
 from django.db.models import QuerySet
 
+from apps.catalog.filters import ProductFilter
 from apps.catalog.models import Category, Product
 from apps.orders.models import OrderItem
 from apps.reviews.models import Review
@@ -14,6 +15,7 @@ ORDERING_CHOICES = {
     'price': 'price',
     '-price': '-price',
     '-rating': '-_rating_avg',
+    '-sold': '-_sold_qty',
     '-created_at': '-created_at',
 }
 
@@ -23,19 +25,30 @@ def get_featured_products(limit: int = 6) -> QuerySet[Product]:
     return Product.objects.for_listing().order_by('-_rating_avg', '-created_at')[:limit]  # type: ignore[misc]
 
 
+def get_best_sellers(limit: int = 6) -> QuerySet[Product]:
+    """Active products with the most sold quantities, newest first."""
+    return Product.objects.for_listing().order_by('-_sold_qty', '-created_at')[:limit]  # type: ignore[misc]
+
+
 def get_product_listing(
     *,
     category_slug: str | None = None,
     ordering: str = '-created_at',
 ) -> QuerySet[Product]:
     """Active products filtered by optional category (with descendants) and ordered."""
-    queryset = Product.objects.for_listing()
+    queryset = Product.objects.for_listing().select_related('category')
     if category_slug:
         category = Category.objects.filter(slug=category_slug).first()
         if category is None:
             return queryset.none()
         queryset = queryset.filter(category__in=[category, *category.get_descendants()])
     return queryset.order_by(ORDERING_CHOICES.get(ordering, '-created_at'))
+
+
+def get_product_query(params: Mapping[str, Any]) -> QuerySet[Product]:
+    """Active products ordered and filtered from storefront/API query parameters."""
+    queryset = get_product_listing(ordering=params.get('ordering', '-created_at'))
+    return ProductFilter(params, queryset=queryset).qs
 
 
 def get_product_detail(product_id: int) -> Product | None:

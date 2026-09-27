@@ -6,7 +6,7 @@
 <main>
     <div class="container main-content-grid">
         <aside class="sidebar filter-menu">
-            <form method="get" action="{% url 'catalog:product_list' %}" class="filter-form">
+            <form method="get" action="{{ request.path }}" class="filter-form">
                 <div class="sidebar__section">
                     <h3 class="section-title">Search</h3>
                     <div class="search-input-wrapper">
@@ -20,11 +20,11 @@
                 <div class="sidebar__section">
                     <h3 class="section-title">Category</h3>
                     <select name="category" class="filter-form__select">
-                        <option value="">All categories</option>
+                        <option value="" {% if not request.GET.category and not current_category_slug %}selected{% endif %}>All categories</option>
                         {% for category in categories %}
-                            <option value="{{ category.slug }}" {% if filter.form.category.value == category.slug %}selected{% endif %}>{{ category.name }}</option>
+                            <option value="{{ category.slug }}" {% if filter.form.category.value == category.slug or not request.GET.category and current_category_slug == category.slug %}selected{% endif %}>{{ category.name }}</option>
                             {% for child in category.children.all %}
-                                <option value="{{ child.slug }}" {% if filter.form.category.value == child.slug %}selected{% endif %}>&nbsp;&nbsp;&nbsp;&nbsp;{{ child.name }}</option>
+                                <option value="{{ child.slug }}" {% if filter.form.category.value == child.slug or not request.GET.category and current_category_slug == child.slug %}selected{% endif %}>&nbsp;&nbsp;&nbsp;&nbsp;{{ child.name }}</option>
                             {% endfor %}
                         {% endfor %}
                     </select>
@@ -62,6 +62,7 @@
                     <a href="{% querystring ordering='price' %}" class="sort-button {% if request.GET.ordering == 'price' %}active-sort{% endif %}">Price ascending</a>
                     <a href="{% querystring ordering='-price' %}" class="sort-button {% if request.GET.ordering == '-price' %}active-sort{% endif %}">Price descending</a>
                     <a href="{% querystring ordering='-rating' %}" class="sort-button {% if request.GET.ordering == '-rating' %}active-sort{% endif %}">Rating</a>
+                    <a href="{% querystring ordering='-sold' %}" class="sort-button {% if request.GET.ordering == '-sold' %}active-sort{% endif %}">Popularity</a>
                 </div>
             </div>
 

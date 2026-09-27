@@ -18,6 +18,11 @@ def get_user_orders(user: Any, *, status: str = '') -> QuerySet[Order]:
     return queryset
 
 
+def get_user_order(user: Any, order_id: int) -> Order | None:
+    """A single order belonging to the user (with items), or None when absent."""
+    return Order.objects.filter(pk=order_id, user=user).prefetch_related('items__product').first()
+
+
 def get_cart_lines(cart: Cart) -> list[dict[str, Any]]:
     """Active cart rows with live prices, skipping products that are unavailable."""
     product_ids = [int(pk) for pk in cart.items()]

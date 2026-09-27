@@ -7,12 +7,12 @@ from django.views.generic import FormView
 
 from apps.catalog.models import Product
 from apps.catalog.selectors import (
-    can_submit_review,
     get_product_detail_by_slug,
     get_product_page_context,
 )
 from apps.orders.forms import AddToCartForm
 from apps.reviews.forms import ReviewForm
+from apps.reviews.services import ReviewNotAllowedError, create_review
 
 
 class ReviewCreateView(LoginRequiredMixin, FormView):
@@ -43,16 +43,19 @@ class ReviewCreateView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         product = self.get_product()
-        if not can_submit_review(self.request.user, product):
+        try:
+            create_review(
+                user=self.request.user,
+                product=product,
+                rating=form.cleaned_data['rating'],
+                comment=form.cleaned_data['comment'],
+            )
+        except ReviewNotAllowedError:
             messages.error(
                 self.request,
                 'You can only review a product after purchasing it.',
             )
             return redirect(self.get_success_url())
-        review = form.save(commit=False)
-        review.product = product
-        review.user = self.request.user
-        review.save()
         messages.success(self.request, 'Thank you! Your review has been published.')
         return redirect(self.get_success_url())
 

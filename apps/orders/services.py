@@ -40,6 +40,19 @@ class OutOfStockError(ValueError):
         super().__init__(f'Only {available} of "{product_name}" are in stock ({requested} requested).')
 
 
+class OrderTransitionError(ValueError):
+    """Raised when an order status change is not allowed."""
+
+
+def cancel_order(order: Order) -> Order:
+    """Cancel an order that has not been shipped yet; returns the updated order."""
+    if order.status in (Order.Status.SHIPPED, Order.Status.DELIVERED, Order.Status.CANCELLED):
+        raise OrderTransitionError(f'Order #{order.order_number} cannot be cancelled.')
+    order.status = Order.Status.CANCELLED
+    order.save(update_fields=['status', 'updated_at'])
+    return order
+
+
 @transaction.atomic
 def create_order(
     *,

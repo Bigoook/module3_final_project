@@ -3,13 +3,14 @@ from typing import Any
 
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import Avg, Count, Value
+from django.db.models import Avg, Count, IntegerField, OuterRef, Subquery, Sum, Value
 from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 from apps.core.utils import make_slug
+from apps.orders.models import Order, OrderItem
 
 
 class Category(TimeStampedModel):
@@ -50,12 +51,20 @@ class Category(TimeStampedModel):
 
 
 class ProductManager(models.Manager['Product']):
-    """Query API for active products annotated with review ratings."""
+    """Query API for active products annotated with review ratings and sold quantities."""
 
     def for_listing(self) -> models.QuerySet['Product']:
+        sold_qty = (
+            OrderItem.objects.filter(product_id=OuterRef('pk'))
+            .exclude(order__status=Order.Status.CANCELLED)
+            .values('product')
+            .annotate(total_quantity=Sum('quantity'))
+            .values('total_quantity')
+        )
         return self.filter(is_active=True).annotate(
             _rating_avg=Coalesce(Avg('reviews__rating'), Value(0.0)),
             _rating_count=Count('reviews'),
+            _sold_qty=Coalesce(Subquery(sold_qty, output_field=IntegerField()), Value(0)),
         )
 
 
@@ -108,6 +117,10 @@ class Product(TimeStampedModel):
     @property
     def rating_count(self) -> int:
         return int(getattr(self, '_rating_count', 0) or 0)
+
+    @property
+    def sold_qty(self) -> int:
+        return int(getattr(self, '_sold_qty', 0) or 0)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         if not self.slug:
