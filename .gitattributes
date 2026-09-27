@@ -1,0 +1,4 @@
+# Docker build context is LF-only: sh shebangs and Dockerfile break with CRLF.
+*.sh text eol=lf
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
