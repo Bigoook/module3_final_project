@@ -29,7 +29,7 @@ $env:PATH = "C:\Program Files\gettext-iconv\bin;$env:PATH"
 .venv\Scripts\python.exe manage.py compilemessages -l uk
 ```
 
-- `*.mo` у `.gitignore`, тому `compilemessages` треба виконувати після deploy/оновлення — інакше зміни не видно.
+- `*.mo` у `.gitignore`, тому `compilemessages` треба виконувати після deploy/оновлення — інакше зміни не видно. Потрібен пакет **gettext** (`msgfmt`): у CI та в `docker-entrypoint.sh` він встановлюється/компілюється автоматично, а `conftest.py` перед тестами збирає `.mo`, якщо вони застаріли або відсутні.
 - Нові рядки: `{% translate %}` / `{% blocktranslate %}` у шаблонах, `gettext` / `gettext_lazy` у Python; інтерполяція — лише іменовані плейсхолдери `%(name)s`.
 - Назви товарів і категорій — дані БД, вони лишаються англійською в обох мовах.
 - Листи про замовлення рендеряться без request, тому за замовчуванням надсилаються англійською; щоб додати іншу мову листа, потрібно зберігати мову користувача і активувати її через `translation.override`.
