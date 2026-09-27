@@ -42,6 +42,12 @@ def stars(value) -> str:
     return mark_safe(''.join(icons))  # ruff: ignore[suspicious-mark-safe-usage]
 
 
+@register.simple_tag
+def shop_name() -> str:
+    """Return the shop name from settings, for templates rendered without a context."""
+    return settings.SHOP_NAME
+
+
 @register.simple_tag(takes_context=True)
 def language_url(context: Context, code: str) -> str:
     """Return the current page URL in the given language, query string preserved."""
