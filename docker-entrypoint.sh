@@ -9,6 +9,13 @@ echo '[entrypoint] compiling translations...'
 # --check-format so a broken %(name)s placeholder fails fast instead of at runtime.
 find locale -name '*.po' -exec sh -c 'msgfmt --check-format -o "${1%.po}.mo" "$1"' _ {} \;
 
+# Opt-in: production serves static files through WhiteNoise, which needs
+# STATIC_ROOT populated. Local dev keeps Django's static handling instead.
+if [ "${COLLECTSTATIC:-0}" = '1' ]; then
+    echo '[entrypoint] collecting static files...'
+    python manage.py collectstatic --noinput
+fi
+
 echo '[entrypoint] applying migrations...'
 python manage.py migrate --noinput
 

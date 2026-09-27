@@ -7,3 +7,10 @@ local_docs/
 **/__pycache__/
 media/
 staticfiles/
+db.sqlite3
+*.sqlite3
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
