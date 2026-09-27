@@ -1,145 +1,992 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: module3_final_project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 13:15+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2026-09-27 14:30+0300\n"
+"PO-Revision-Date: 2026-09-27 14:30+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language-Team: Ukrainian <uk@li.org>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: .\apps\catalog\models.py:6 .\apps\catalog\models.py:29
+#: .\apps\accounts\admin.py:24
+msgid "Personal info"
+msgstr "Особиста інформація"
+
+#: .\apps\accounts\admin.py:28
+msgid "Permissions"
+msgstr "Права доступу"
+
+#: .\apps\accounts\admin.py:31
+msgid "Important dates"
+msgstr "Важливі дати"
+
+#: .\apps\accounts\forms.py:12 .\apps\orders\forms.py:21
+#: .\templates\accounts\profile.html:23 .\templates\accounts\register.html:25
+#: .\templates\orders\checkout.html:22
+msgid "Email"
+msgstr "Електронна пошта"
+
+#: .\apps\accounts\forms.py:21
+msgid "A user with that email already exists."
+msgstr "Користувач із такою електронною поштою вже існує."
+
+#: .\apps\accounts\models.py:7 .\apps\orders\models.py:70
+msgid "phone"
+msgstr "телефон"
+
+#: .\apps\accounts\models.py:8
+msgid "default address"
+msgstr "адреса за замовчуванням"
+
+#: .\apps\accounts\views.py:53
+#, python-format
+msgid "Welcome, %(username)s!"
+msgstr "Вітаємо, %(username)s!"
+
+#: .\apps\accounts\views.py:70
+msgid "Profile updated."
+msgstr "Профіль оновлено."
+
+#: .\apps\catalog\models.py:17 .\apps\catalog\models.py:73
 msgid "name"
 msgstr "Назва"
 
-#: .\apps\catalog\models.py:7 .\apps\catalog\models.py:30
+#: .\apps\catalog\models.py:18 .\apps\catalog\models.py:74
 msgid "slug"
 msgstr "Слаг"
 
-#: .\apps\catalog\models.py:10
+#: .\apps\catalog\models.py:21
 msgid "parent category"
-msgstr "Батьківська категорія"
+msgstr "батьківська категорія"
 
-#: .\apps\catalog\models.py:16 .\apps\catalog\models.py:42
-#: .\apps\orders\models.py:35 .\apps\reviews\models.py:25
-msgid "created at"
-msgstr "Створено"
-
-#: .\apps\catalog\models.py:17 .\apps\catalog\models.py:43
-#: .\apps\orders\models.py:36
-msgid "updated at"
-msgstr "Оновлено"
-
-#: .\apps\catalog\models.py:21 .\apps\catalog\models.py:35
+#: .\apps\catalog\models.py:30 .\apps\catalog\models.py:84
 msgid "category"
 msgstr "Категорія"
 
-#: .\apps\catalog\models.py:22
+#: .\apps\catalog\models.py:31
 msgid "categories"
 msgstr "Категорії"
 
-#: .\apps\catalog\models.py:31
+#: .\apps\catalog\models.py:75
 msgid "description"
 msgstr "Опис"
 
-#: .\apps\catalog\models.py:32 .\apps\orders\models.py:61
+#: .\apps\catalog\models.py:77 .\apps\orders\models.py:111
 msgid "price"
 msgstr "Ціна"
 
-#: .\apps\catalog\models.py:39
+#: .\apps\catalog\models.py:88
 msgid "image"
 msgstr "Зображення"
 
-#: .\apps\catalog\models.py:40
+#: .\apps\catalog\models.py:89
 msgid "is active"
 msgstr "Активний"
 
-#: .\apps\catalog\models.py:41
+#: .\apps\catalog\models.py:90
 msgid "stock"
 msgstr "Залишок"
 
-#: .\apps\catalog\models.py:47 .\apps\orders\models.py:56
+#: .\apps\catalog\models.py:94 .\apps\orders\models.py:105
 #: .\apps\reviews\models.py:10
 msgid "product"
-msgstr "Товар"
+msgstr "Продукт"
 
-#: .\apps\catalog\models.py:48
+#: .\apps\catalog\models.py:95
 msgid "products"
-msgstr "Товари"
+msgstr "Продукти"
 
-#: .\apps\orders\models.py:10
+#: .\apps\core\management\commands\setup_roles.py:47
+msgid ""
+"Creates the admin role groups with their model permissions (idempotent)."
+msgstr "Створює групи ролей адміністратора разом із правами на моделі (ідемпотентно)."
+
+#: .\apps\core\management\commands\setup_roles.py:53
+#, python-format
+msgid "Done: \"%(product_manager)s\" and \"%(order_support)s\" are configured."
+msgstr "Готово: групи «%(product_manager)s» і «%(order_support)s» налаштовано."
+
+#: .\apps\core\models.py:6 .\apps\reviews\models.py:25
+msgid "created at"
+msgstr "Створено"
+
+#: .\apps\core\models.py:7
+msgid "updated at"
+msgstr "Оновлено"
+
+#: .\apps\orders\forms.py:9
+msgid "Enter a valid phone number (digits, +, -, spaces, parentheses)."
+msgstr "Введіть коректний номер телефону (цифри, +, -, пробіли, дужки)."
+
+#: .\apps\orders\forms.py:14
+#| msgid "quantity"
+msgid "Quantity"
+msgstr "Кількість"
+
+#: .\apps\orders\forms.py:20 .\templates\orders\checkout.html:18
+msgid "Full Name"
+msgstr "Повне ім’я"
+
+#: .\apps\orders\forms.py:22 .\templates\accounts\profile.html:27
+#: .\templates\orders\checkout.html:26
+msgid "Phone number"
+msgstr "Номер телефону"
+
+#: .\apps\orders\forms.py:23 .\templates\orders\checkout.html:30
+#| msgid "shipping address"
+msgid "Shipping address"
+msgstr "Адреса доставки"
+
+#: .\apps\orders\forms.py:28 .\templates\orders\checkout.html:36
+msgid "Payment Method"
+msgstr "Спосіб оплати"
+
+#: .\apps\orders\models.py:17
+msgid "order number counter"
+msgstr "лічильник номерів замовлень"
+
+#: .\apps\orders\models.py:18
+msgid "order number counters"
+msgstr "лічильники номерів замовлень"
+
+#: .\apps\orders\models.py:31
 msgid "pending"
-msgstr "Очікується"
+msgstr "Очікує"
 
-#: .\apps\orders\models.py:11
+#: .\apps\orders\models.py:32
 msgid "paid"
 msgstr "Оплачено"
 
-#: .\apps\orders\models.py:12
+#: .\apps\orders\models.py:33
 msgid "shipped"
 msgstr "Відправлено"
 
-#: .\apps\orders\models.py:13
+#: .\apps\orders\models.py:34
 msgid "delivered"
 msgstr "Доставлено"
 
-#: .\apps\orders\models.py:14
+#: .\apps\orders\models.py:35
 msgid "cancelled"
 msgstr "Скасовано"
 
-#: .\apps\orders\models.py:18 .\apps\reviews\models.py:16
+#: .\apps\orders\models.py:38
+msgid "card"
+msgstr "Картка"
+
+#: .\apps\orders\models.py:39
+msgid "cash on delivery"
+msgstr "Готівка при отриманні"
+
+#: .\apps\orders\models.py:40
+msgid "bank transfer"
+msgstr "Банківський переказ"
+
+#: .\apps\orders\models.py:44 .\apps\reviews\models.py:16
 msgid "user"
 msgstr "Користувач"
 
-#: .\apps\orders\models.py:23
+#: .\apps\orders\models.py:48
+msgid "order number"
+msgstr "Номер замовлення"
+
+#: .\apps\orders\models.py:50
 msgid "status"
 msgstr "Статус"
 
-#: .\apps\orders\models.py:29
+#: .\apps\orders\models.py:56
 msgid "total price"
-msgstr "Загальна сума"
+msgstr "Загальна вартість"
 
-#: .\apps\orders\models.py:34
-msgid "shipping address"
-msgstr "Адреса доставки"
+#: .\apps\orders\models.py:63
+msgid "payment method"
+msgstr "Спосіб оплати"
 
-#: .\apps\orders\models.py:40 .\apps\orders\models.py:50
-msgid "order"
-msgstr "Замовлення"
+#: .\apps\orders\models.py:68
+#| msgid "name"
+msgid "full name"
+msgstr "повне ім’я"
 
-#: .\apps\orders\models.py:41
-msgid "orders"
-msgstr "Замовлення"
-
-#: .\apps\orders\models.py:60
-msgid "quantity"
-msgstr "Кількість"
+#: .\apps\orders\models.py:69
+msgid "email"
+msgstr "електронна пошта"
 
 #: .\apps\orders\models.py:71
-msgid "item"
-msgstr "Позиція"
+msgid "shipping address"
+msgstr "адреса доставки"
 
-#: .\apps\orders\models.py:72
+#: .\apps\orders\models.py:75 .\apps\orders\models.py:99
+msgid "order"
+msgstr "замовлення"
+
+#: .\apps\orders\models.py:76
+msgid "orders"
+msgstr "замовлення"
+
+#: .\apps\orders\models.py:109
+msgid "quantity"
+msgstr "кількість"
+
+#: .\apps\orders\models.py:129
+msgid "item"
+msgstr "позиція"
+
+#: .\apps\orders\models.py:130
 msgid "items"
-msgstr "Позиції"
+msgstr "позиції"
+
+#: .\apps\orders\services.py:42
+#, python-format
+msgid ""
+"Only %(available)s of \"%(product)s\" are in stock (%(requested)s requested)."
+msgstr "У наявності лише %(available)s шт. «%(product)s» (замовлено %(requested)s шт.)."
+
+#: .\apps\orders\services.py:58
+#, python-format
+msgid "Order #%(number)s cannot be cancelled."
+msgstr "Замовлення №%(number)s не можна скасувати."
+
+#: .\apps\orders\views.py:59
+msgid "Invalid quantity — added 1 item instead."
+msgstr "Некоректна кількість — додано 1 одиницю."
+
+#: .\apps\orders\views.py:65
+#, python-format
+msgid "\"%(product)s\" is currently out of stock."
+msgstr "«%(product)s» зараз немає в наявності."
+
+#: .\apps\orders\views.py:71 .\apps\orders\views.py:108
+#, python-format
+msgid "Only %(quantity)s of \"%(product)s\" are in stock."
+msgstr "У наявності лише %(quantity)s шт. «%(product)s»."
+
+#: .\apps\orders\views.py:76
+#, python-format
+msgid "Added %(quantity)s × \"%(product)s\" to your cart."
+msgstr "Додано %(quantity)s × «%(product)s» у кошик."
+
+#: .\apps\orders\views.py:93
+msgid "Quantity must be a whole number of at least 1."
+msgstr "Кількість має бути цілим числом не менше 1."
+
+#: .\apps\orders\views.py:98
+msgid "That product is not in your cart."
+msgstr "Цього продукту немає у вашому кошику."
+
+#: .\apps\orders\views.py:102
+#, python-format
+msgid "\"%(product)s\" went out of stock and was removed from your cart."
+msgstr "«%(product)s» закінчився і був видалений з вашого кошика."
+
+#: .\apps\orders\views.py:113
+#, python-format
+msgid "Updated \"%(product)s\" quantity to %(quantity)s."
+msgstr "Кількість «%(product)s» оновлено до %(quantity)s."
+
+#: .\apps\orders\views.py:130
+#, python-format
+msgid "Removed \"%(product)s\" from your cart."
+msgstr "«%(product)s» видалено з вашого кошика."
+
+#: .\apps\orders\views.py:165 .\apps\orders\views.py:173
+#: .\templates\orders\cart.html:13
+msgid "Your cart is empty."
+msgstr "Ваш кошик порожній."
+
+#: .\apps\orders\views.py:195
+#, python-format
+msgid "Order #%(number)s placed. A confirmation email is on its way."
+msgstr "Замовлення №%(number)s оформлено. Лист-підтвердження вже в дорозі."
 
 #: .\apps\reviews\models.py:21
 msgid "rating"
-msgstr "Оцінка"
+msgstr "оцінка"
 
 #: .\apps\reviews\models.py:24
 msgid "comment"
-msgstr "Коментар"
+msgstr "коментар"
 
 #: .\apps\reviews\models.py:35
 msgid "review"
-msgstr "Відгук"
+msgstr "відгук"
 
 #: .\apps\reviews\models.py:36
 msgid "reviews"
+msgstr "відгуки"
+
+#: .\apps\reviews\services.py:18 .\apps\reviews\views.py:57
+msgid "You can only review a product after purchasing it."
+msgstr "Ви можете залишити відгук лише після покупки продукту."
+
+#: .\apps\reviews\views.py:62
+msgid "Thank you! Your review has been published."
+msgstr "Дякуємо! Ваш відгук опубліковано."
+
+#: .\config\admin_site.py:17
+msgid "Shop management"
+msgstr "Керування магазином"
+
+#: .\config\admin_site.py:34 .\templates\admin\shop_index.html:9
+msgid "Shop statistics"
+msgstr "Статистика магазину"
+
+#: .\templates\404.html:4 .\templates\404.html:11
+msgid "Page not found"
+msgstr "Сторінку не знайдено"
+
+#: .\templates\404.html:13
+msgid "Sorry, the page you are looking for does not exist or has been moved."
+msgstr "Вибачте, сторінку, яку ви шукаєте, не існує або її було переміщено."
+
+#: .\templates\404.html:15 .\templates\500.html:28
+msgid "Back to Home"
+msgstr "На головну"
+
+#: .\templates\500.html:6
+msgid "Server error"
+msgstr "Помилка сервера"
+
+#: .\templates\500.html:24
+msgid "Something went wrong"
+msgstr "Щось пішло не так"
+
+#: .\templates\500.html:26
+msgid ""
+"Sorry, an unexpected error occurred on our end. Please try again in a few "
+"minutes."
+msgstr "Вибачте, на нашому боці сталася неочікувана помилка. Спробуйте ще раз за кілька хвилин."
+
+#: .\templates\500.html:34 .\templates\partials\footer.html:14
+msgid "All rights reserved"
+msgstr "Усі права захищено"
+
+#: .\templates\accounts\login.html:4 .\templates\accounts\login.html:14
+#: .\templates\accounts\login.html:32
+msgid "Sign In"
+msgstr "Увійти"
+
+#: .\templates\accounts\login.html:9 .\templates\accounts\register.html:9
+msgid "Background pattern"
+msgstr "Фоновий патерн"
+
+#: .\templates\accounts\login.html:21 .\templates\accounts\register.html:21
+#| msgid "name"
+msgid "Username"
+msgstr "Ім’я користувача"
+
+#: .\templates\accounts\login.html:25 .\templates\accounts\register.html:29
+msgid "Password"
+msgstr "Пароль"
+
+#: .\templates\accounts\login.html:36
+msgid "Don't have an account?"
+msgstr "Немає облікового запису?"
+
+#: .\templates\accounts\login.html:36
+msgid "Sign up"
+msgstr "Зареєструватися"
+
+#: .\templates\accounts\password_change.html:4
+#: .\templates\accounts\password_change.html:11
+#: .\templates\accounts\password_change.html:31
+#: .\templates\accounts\profile.html:39
+msgid "Change Password"
+msgstr "Зміна пароля"
+
+#: .\templates\accounts\password_change.html:18
+msgid "Current password"
+msgstr "Поточний пароль"
+
+#: .\templates\accounts\password_change.html:22
+msgid "New password"
+msgstr "Новий пароль"
+
+#: .\templates\accounts\password_change.html:26
+msgid "Confirm new password"
+msgstr "Підтвердіть новий пароль"
+
+#: .\templates\accounts\password_change_done.html:4
+msgid "Password Changed"
+msgstr "Пароль змінено"
+
+#: .\templates\accounts\password_change_done.html:10
+msgid "Password changed"
+msgstr "Пароль змінено"
+
+#: .\templates\accounts\password_change_done.html:11
+msgid "Success"
+msgstr "Успіх"
+
+#: .\templates\accounts\password_change_done.html:13
+msgid "Your password has been changed successfully."
+msgstr "Ваш пароль успішно змінено."
+
+#: .\templates\accounts\password_change_done.html:15
+msgid "Back to My Account"
+msgstr "Назад до облікового запису"
+
+#: .\templates\accounts\profile.html:4 .\templates\partials\header.html:27
+msgid "My Account"
+msgstr "Мій обліковий запис"
+
+#: .\templates\accounts\profile.html:10
+msgid "Personal Info"
+msgstr "Особиста інформація"
+
+#: .\templates\accounts\profile.html:15
+msgid "First name"
+msgstr "Ім’я"
+
+#: .\templates\accounts\profile.html:19
+#| msgid "name"
+msgid "Last name"
+msgstr "Прізвище"
+
+#: .\templates\accounts\profile.html:31
+#| msgid "shipping address"
+msgid "Default shipping address"
+msgstr "Адреса доставки за замовчуванням"
+
+#: .\templates\accounts\profile.html:34
+msgid "Save"
+msgstr "Зберегти"
+
+#: .\templates\accounts\profile.html:38 .\templates\orders\order_list.html:9
+msgid "Order History"
+msgstr "Історія замовлень"
+
+#: .\templates\accounts\profile.html:42 .\templates\partials\header.html:42
+msgid "Logout"
+msgstr "Вийти"
+
+#: .\templates\accounts\register.html:4 .\templates\accounts\register.html:14
+#: .\templates\accounts\register.html:38 .\templates\partials\header.html:33
+msgid "Register"
+msgstr "Реєстрація"
+
+#: .\templates\accounts\register.html:33
+msgid "Confirm password"
+msgstr "Підтвердіть пароль"
+
+#: .\templates\accounts\register.html:42
+msgid "Already have an account?"
+msgstr "Вже маєте обліковий запис?"
+
+#: .\templates\accounts\register.html:42
+#: .\templates\catalog\product_detail.html:111
+#: .\templates\partials\header.html:32
+msgid "Sign in"
+msgstr "Увійти"
+
+#: .\templates\admin\api_token.html:6
+msgid "Freshly minted JWT tokens for"
+msgstr "Нові JWT-токени для"
+
+#: .\templates\admin\api_token.html:8
+msgid "Copy them now — the access token is shown only once here."
+msgstr "Скопіюйте їх зараз — токен доступу показується тут лише один раз."
+
+#: .\templates\admin\api_token.html:10
+msgid "Access token (valid for 30 minutes):"
+msgstr "Токен доступу (дійсний 30 хвилин):"
+
+#: .\templates\admin\api_token.html:12
+msgid "Refresh token (valid for 7 days):"
+msgstr "Токен оновлення (дійсний 7 днів):"
+
+#: .\templates\admin\api_token.html:15
+msgid "Use the access token as"
+msgstr "Використовуйте токен доступу як"
+
+#: .\templates\admin\api_token.html:17
+msgid "for the API. Refresh via"
+msgstr "для API. Оновлюйте через"
+
+#: .\templates\admin\api_token.html:19
+msgid "with the refresh token."
+msgstr "з токеном оновлення."
+
+#: .\templates\admin\shop_index.html:7
+msgid "Analytics"
+msgstr "Аналітика"
+
+#: .\templates\admin\shop_stats.html:33
+msgid "Total revenue"
+msgstr "Загальна виручка"
+
+#: .\templates\admin\shop_stats.html:37 .\templates\admin\shop_stats.html:111
+#| msgid "orders"
+msgid "Orders"
+msgstr "Замовлення"
+
+#: .\templates\admin\shop_stats.html:41
+msgid "Average check"
+msgstr "Середній чек"
+
+#: .\templates\admin\shop_stats.html:45
+#| msgid "orders"
+msgid "Pending orders"
+msgstr "Очікують замовлення"
+
+#: .\templates\admin\shop_stats.html:49
+msgid "Customers"
+msgstr "Покупці"
+
+#: .\templates\admin\shop_stats.html:53
+#| msgid "reviews"
+msgid "Reviews"
 msgstr "Відгуки"
+
+#: .\templates\admin\shop_stats.html:54
+#, python-format
+msgid "%(count)s (avg %(rating)s)"
+msgstr "%(count)s (сер. %(rating)s)"
+
+#: .\templates\admin\shop_stats.html:60
+msgid "Top-selling products"
+msgstr "Найбільш продавані продукти"
+
+#: .\templates\admin\shop_stats.html:64 .\templates\admin\shop_stats.html:88
+#: .\templates\emails\order_confirmation.html:15
+#: .\templates\orders\order_detail.html:19
+#| msgid "product"
+msgid "Product"
+msgstr "Продукт"
+
+#: .\templates\admin\shop_stats.html:65
+msgid "Sold"
+msgstr "Продано"
+
+#: .\templates\admin\shop_stats.html:66 .\templates\admin\shop_stats.html:112
+msgid "Revenue"
+msgstr "Виручка"
+
+#: .\templates\admin\shop_stats.html:77
+msgid "No sales yet."
+msgstr "Продажів ще немає."
+
+#: .\templates\admin\shop_stats.html:84
+#, python-format
+msgid "Low stock (≤ %(threshold)s)"
+msgstr "Малий залишок (≤ %(threshold)s)"
+
+#: .\templates\admin\shop_stats.html:89
+#| msgid "stock"
+msgid "Stock"
+msgstr "Залишок"
+
+#: .\templates\admin\shop_stats.html:99
+msgid "No low-stock products."
+msgstr "Продуктів із малим залишком немає."
+
+#: .\templates\admin\shop_stats.html:106
+msgid "Orders — last 7 days"
+msgstr "Замовлення — останні 7 днів"
+
+#: .\templates\admin\shop_stats.html:110
+msgid "Day"
+msgstr "День"
+
+#: .\templates\admin\shop_stats.html:123
+msgid "No orders in the last 7 days."
+msgstr "Замовлень за останні 7 днів немає."
+
+#: .\templates\admin\shop_stats.html:130
+msgid "Back to admin"
+msgstr "Назад до адмінки"
+
+#: .\templates\catalog\home.html:4
+msgid "Home"
+msgstr "Головна"
+
+#: .\templates\catalog\home.html:9
+msgid "Beautiful hops on a dark background"
+msgstr "Гарні шишки на темному тлі"
+
+#: .\templates\catalog\home.html:16
+#| msgid "products"
+msgid "Featured products"
+msgstr "Рекомендовані продукти"
+
+#: .\templates\catalog\home.html:17 .\templates\catalog\home.html:31
+#| msgid "products"
+msgid "View all products"
+msgstr "Переглянути всі продукти"
+
+#: .\templates\catalog\home.html:23
+msgid "No featured products yet."
+msgstr "Поки що немає рекомендованих продуктів."
+
+#: .\templates\catalog\home.html:30
+msgid "Best sellers"
+msgstr "Хіти продажів"
+
+#: .\templates\catalog\home.html:37
+msgid "No products sold yet."
+msgstr "Поки що нічого не продано."
+
+#: .\templates\catalog\product_detail.html:30
+#, python-format
+msgid "(%(counter)s review)"
+msgid_plural "(%(counter)s reviews)"
+msgstr[0] "(%(counter)s відгук)"
+msgstr[1] "(%(counter)s відгуки)"
+msgstr[2] "(%(counter)s відгуків)"
+
+#: .\templates\catalog\product_detail.html:33
+#, python-format
+msgid "In stock (%(stock)s)"
+msgstr "В наявності (%(stock)s)"
+
+#: .\templates\catalog\product_detail.html:35
+#: .\templates\catalog\product_detail.html:61
+#: .\templates\partials\product_card.html:27
+msgid "Out of stock"
+msgstr "Немає в наявності"
+
+#: .\templates\catalog\product_detail.html:47 .\templates\orders\cart.html:37
+#| msgid "quantity"
+msgid "Decrease quantity"
+msgstr "Зменшити кількість"
+
+#: .\templates\catalog\product_detail.html:51 .\templates\orders\cart.html:39
+#| msgid "quantity"
+msgid "Increase quantity"
+msgstr "Збільшити кількість"
+
+#: .\templates\catalog\product_detail.html:57
+#: .\templates\partials\product_card.html:36
+msgid "Add to Cart"
+msgstr "Додати в кошик"
+
+#: .\templates\catalog\product_detail.html:68
+#| msgid "reviews"
+msgid "Latest reviews"
+msgstr "Останні відгуки"
+
+#: .\templates\catalog\product_detail.html:86
+msgid "No reviews yet. Be the first to share your experience."
+msgstr "Відгуків ще немає. Будьте першим, хто поділиться враженням."
+
+#: .\templates\catalog\product_detail.html:94
+#| msgid "rating"
+msgid "Your rating"
+msgstr "Ваша оцінка"
+
+#: .\templates\catalog\product_detail.html:104
+#| msgid "comment"
+msgid "Comment"
+msgstr "Коментар"
+
+#: .\templates\catalog\product_detail.html:107
+#| msgid "review"
+msgid "Submit review"
+msgstr "Надіслати відгук"
+
+#: .\templates\catalog\product_detail.html:111
+msgid " to leave a review after your order is delivered."
+msgstr " щоб залишити відгук після доставки замовлення."
+
+#: .\templates\catalog\product_detail.html:118
+msgid "You may also like"
+msgstr "Вам також може сподобатися"
+
+#: .\templates\catalog\product_list.html:12
+#: .\templates\catalog\product_list.html:14
+#: .\templates\catalog\product_list.html:15
+msgid "Search"
+msgstr "Пошук"
+
+#: .\templates\catalog\product_list.html:22
+#| msgid "category"
+msgid "Category"
+msgstr "Категорія"
+
+#: .\templates\catalog\product_list.html:24
+#| msgid "categories"
+msgid "All categories"
+msgstr "Усі категорії"
+
+#: .\templates\catalog\product_list.html:35
+#: .\templates\emails\order_confirmation.html:17
+#: .\templates\orders\order_detail.html:20
+#| msgid "price"
+msgid "Price"
+msgstr "Ціна"
+
+#: .\templates\catalog\product_list.html:37
+msgid "Min"
+msgstr "Від"
+
+#: .\templates\catalog\product_list.html:38
+msgid "Max"
+msgstr "До"
+
+#: .\templates\catalog\product_list.html:43
+msgid "In stock only"
+msgstr "Лише в наявності"
+
+#: .\templates\catalog\product_list.html:53
+msgid "Apply filters"
+msgstr "Застосувати фільтри"
+
+#: .\templates\catalog\product_list.html:61
+msgid "New"
+msgstr "Новинки"
+
+#: .\templates\catalog\product_list.html:63
+msgid "Price ascending"
+msgstr "Ціна: за зростанням"
+
+#: .\templates\catalog\product_list.html:64
+msgid "Price descending"
+msgstr "Ціна: за спаданням"
+
+#: .\templates\catalog\product_list.html:65
+#| msgid "rating"
+msgid "Rating"
+msgstr "Оцінка"
+
+#: .\templates\catalog\product_list.html:66
+msgid "Popularity"
+msgstr "Популярність"
+
+#: .\templates\catalog\product_list.html:74
+msgid "No products match your filters."
+msgstr "Жоден продукт не відповідає фільтрам."
+
+#: .\templates\core\guides_recipes.html:4
+#: .\templates\core\guides_recipes.html:10 .\templates\partials\header.html:13
+msgid "Guides &amp; Recipes"
+msgstr "Гайди &amp; рецепти"
+
+#: .\templates\core\guides_recipes.html:11
+msgid "Coming Soon!"
+msgstr "Незабаром!"
+
+#: .\templates\core\guides_recipes.html:13
+msgid ""
+"We are working hard to bring you the best guides and tested recipes from the "
+"world of homebrewing."
+msgstr "Ми докладаємо зусиль, щоб підготувати для вас найкращі гайди та перевірені рецепти з світу домашнього пивоваріння."
+
+#: .\templates\core\guides_recipes.html:14
+msgid ""
+"Here you will find everything from beginner's guides on your first brew to "
+"advanced techniques for experienced brewers, as well as a collection of "
+"recipes for various beer styles using our products."
+msgstr "Тут ви знайдете все: від гайдів для початківців про вашу першу партію до просунутих технік для досвідчених пивоварів, а також збірку рецептів різних сортів пива на нашій продукції."
+
+#: .\templates\core\guides_recipes.html:15
+msgid "Stay tuned for updates!"
+msgstr "Стежте за оновленнями!"
+
+#: .\templates\core\guides_recipes.html:17
+msgid "Back to Products"
+msgstr "Назад до продуктів"
+
+#: .\templates\emails\order_confirmation.html:6
+#, python-format
+msgid "%(shop_name)s — order #%(number)s"
+msgstr "%(shop_name)s — замовлення №%(number)s"
+
+#: .\templates\emails\order_confirmation.html:9
+#, python-format
+msgid "Thank you for your order, %(name)s!"
+msgstr "Дякуємо за ваше замовлення, %(name)s!"
+
+#: .\templates\emails\order_confirmation.html:10
+#, python-format
+msgid ""
+"Order #%(number)s · %(order.created_at|date:\"j M Y\")s · "
+"%(order.get_payment_method_display)s"
+msgstr "Замовлення №%(number)s · %(order.created_at|date:\"j M Y\")s · %(order.get_payment_method_display)s"
+
+#: .\templates\emails\order_confirmation.html:16
+#: .\templates\orders\order_detail.html:21
+msgid "Qty"
+msgstr "Кількість"
+
+#: .\templates\emails\order_confirmation.html:32
+#, python-format
+msgid "Total: %(total)s %(shop_currency)s"
+msgstr "Разом: %(total)s %(shop_currency)s"
+
+#: .\templates\emails\order_confirmation.html:36
+msgid "We will ship to:"
+msgstr "Ми доставимо за адресою:"
+
+#: .\templates\orders\cart.html:4 .\templates\orders\cart.html:9
+#: .\templates\partials\header.html:35 .\templates\partials\header.html:36
+#| msgid "shipping address"
+msgid "Shopping Cart"
+msgstr "Кошик"
+
+#: .\templates\orders\cart.html:14
+#| msgid "products"
+msgid "Browse products"
+msgstr "Переглянути продукти"
+
+#: .\templates\orders\cart.html:30
+#, python-format
+msgid "%(price)s each"
+msgstr "%(price)s за шт."
+
+#: .\templates\orders\cart.html:41
+#| msgid "updated at"
+msgid "Update"
+msgstr "Оновити"
+
+#: .\templates\orders\cart.html:46
+msgid "Remove"
+msgstr "Видалити"
+
+#: .\templates\orders\cart.html:57 .\templates\orders\checkout.html:60
+#: .\templates\orders\order_detail.html:37
+#: .\templates\orders\order_list.html:27
+msgid "Total"
+msgstr "Разом"
+
+#: .\templates\orders\cart.html:60
+msgid "Proceed to Checkout"
+msgstr "Перейти до оформлення"
+
+#: .\templates\orders\checkout.html:4
+msgid "Checkout"
+msgstr "Оформлення замовлення"
+
+#: .\templates\orders\checkout.html:9 .\templates\orders\order_list.html:25
+msgid "Order Details"
+msgstr "Деталі замовлення"
+
+#: .\templates\orders\checkout.html:16
+msgid "Shipping information"
+msgstr "Інформація про доставку"
+
+#: .\templates\orders\checkout.html:49
+msgid "Order Summary"
+msgstr "Підсумок замовлення"
+
+#: .\templates\orders\checkout.html:63
+#| msgid "order"
+msgid "Place order"
+msgstr "Оформити замовлення"
+
+#: .\templates\orders\order_detail.html:4
+#: .\templates\orders\order_detail.html:10
+#, python-format
+msgid "Order #%(number)s"
+msgstr "Замовлення №%(number)s"
+
+#: .\templates\orders\order_detail.html:13
+#, python-format
+msgid "Payment method: %(method)s"
+msgstr "Спосіб оплати: %(method)s"
+
+#: .\templates\orders\order_detail.html:22
+msgid "Line total"
+msgstr "Сума позиції"
+
+#: .\templates\orders\order_detail.html:44
+msgid "Shipping"
+msgstr "Доставка"
+
+#: .\templates\orders\order_detail.html:54
+msgid "Cancel order"
+msgstr "Скасувати замовлення"
+
+#: .\templates\orders\order_detail.html:58
+#| msgid "orders"
+msgid "Back to orders"
+msgstr "Назад до замовлень"
+
+#: .\templates\orders\order_list.html:4
+#| msgid "orders"
+msgid "My Orders"
+msgstr "Мої замовлення"
+
+#: .\templates\orders\order_list.html:12
+#| msgid "status"
+msgid "Status"
+msgstr "Статус"
+
+#: .\templates\orders\order_list.html:14
+#| msgid "status"
+msgid "All statuses"
+msgstr "Усі статуси"
+
+#: .\templates\orders\order_list.html:19
+msgid "Filter"
+msgstr "Фільтр"
+
+#: .\templates\orders\order_list.html:26
+msgid "Order Status"
+msgstr "Статус замовлення"
+
+#: .\templates\orders\order_list.html:48
+msgid "You have no orders yet."
+msgstr "У вас ще немає замовлень."
+
+#: .\templates\partials\footer.html:4 .\templates\partials\header.html:7
+#, python-format
+msgid "%(shop)s logo"
+msgstr "Логотип %(shop)s"
+
+#: .\templates\partials\footer.html:7 .\templates\partials\header.html:16
+msgid "Contact"
+msgstr "Контакти"
+
+#: .\templates\partials\footer.html:8
+msgid "FAQ"
+msgstr "Питання й відповіді"
+
+#: .\templates\partials\footer.html:9 .\templates\partials\header.html:14
+msgid "Community"
+msgstr "Спільнота"
+
+#: .\templates\partials\footer.html:10 .\templates\partials\header.html:15
+msgid "Resources"
+msgstr "Ресурси"
+
+#: .\templates\partials\footer.html:11
+msgid "License"
+msgstr "Ліцензія"
+
+#: .\templates\partials\header.html:12
+#| msgid "products"
+msgid "Products"
+msgstr "Продукти"
+
+#: .\templates\partials\header.html:28
+msgid "User Account"
+msgstr "Обліковий запис"
+
+#: .\templates\partials\pagination.html:3
+msgid "Pagination"
+msgstr "Нумерація сторінок"
+
+#: .\templates\partials\pagination.html:7
+#: .\templates\partials\pagination.html:12
+#| msgid "reviews"
+msgid "Previous"
+msgstr "Назад"
+
+#: .\templates\partials\pagination.html:18
+#, python-format
+msgid "of %(total)s"
+msgstr "з %(total)s"
+
+#: .\templates\partials\pagination.html:23
+#: .\templates\partials\pagination.html:28
+msgid "Next"
+msgstr "Далі"
+
+#: .\templates\partials\product_card.html:25
+#| msgid "stock"
+msgid "In stock"
+msgstr "В наявності"
