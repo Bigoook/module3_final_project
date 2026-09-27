@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 
@@ -55,20 +56,25 @@ class CartAddView(View):
             quantity = form.cleaned_data['quantity']
         else:
             quantity = 1
-            messages.warning(request, 'Invalid quantity — added 1 item instead.')
+            messages.warning(request, _('Invalid quantity — added 1 item instead.'))
 
         result = add_product_to_cart(cart, product, quantity)
         if result.status == CartStatus.OUT_OF_STOCK:
-            messages.error(request, f'"{product.name}" is currently out of stock.')
+            messages.error(
+                request,
+                _('"%(product)s" is currently out of stock.') % {'product': product.name},
+            )
         else:
             if result.status == CartStatus.CAPPED:
                 messages.warning(
                     request,
-                    f'Only {result.quantity} of "{product.name}" are in stock.',
+                    _('Only %(quantity)s of "%(product)s" are in stock.')
+                    % {'quantity': result.quantity, 'product': product.name},
                 )
             messages.success(
                 request,
-                f'Added {result.quantity} × "{product.name}" to your cart.',
+                _('Added %(quantity)s × "%(product)s" to your cart.')
+                % {'quantity': result.quantity, 'product': product.name},
             )
         return redirect(product.get_absolute_url())
 
@@ -84,26 +90,28 @@ class CartUpdateView(View):
 
         form = AddToCartForm(request.POST)
         if not form.is_valid():
-            messages.error(request, 'Quantity must be a whole number of at least 1.')
+            messages.error(request, _('Quantity must be a whole number of at least 1.'))
             return redirect('orders:cart')
 
         result = update_cart_quantity(cart, product, form.cleaned_data['quantity'])
         if result.status == CartStatus.MISSING:
-            messages.error(request, 'That product is not in your cart.')
+            messages.error(request, _('That product is not in your cart.'))
         elif result.status == CartStatus.REMOVED:
             messages.warning(
                 request,
-                f'"{product.name}" went out of stock and was removed from your cart.',
+                _('"%(product)s" went out of stock and was removed from your cart.') % {'product': product.name},
             )
         else:
             if result.status == CartStatus.CAPPED:
                 messages.warning(
                     request,
-                    f'Only {result.quantity} of "{product.name}" are in stock.',
+                    _('Only %(quantity)s of "%(product)s" are in stock.')
+                    % {'quantity': result.quantity, 'product': product.name},
                 )
             messages.success(
                 request,
-                f'Updated "{product.name}" quantity to {result.quantity}.',
+                _('Updated "%(product)s" quantity to %(quantity)s.')
+                % {'product': product.name, 'quantity': result.quantity},
             )
         return redirect('orders:cart')
 
@@ -117,7 +125,10 @@ class CartRemoveView(View):
         product = get_object_or_404(Product, pk=product_id)
         cart = Cart(request.session)
         remove_from_cart(cart, product)
-        messages.success(request, f'Removed "{product.name}" from your cart.')
+        messages.success(
+            request,
+            _('Removed "%(product)s" from your cart.') % {'product': product.name},
+        )
         return redirect('orders:cart')
 
 
@@ -151,7 +162,7 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
     def get(self, request: HttpRequest, *args, **kwargs):
         cart = Cart(request.session)
         if not get_cart_lines(cart):
-            messages.info(request, 'Your cart is empty.')
+            messages.info(request, _('Your cart is empty.'))
             return redirect('orders:cart')
         return super().get(request, *args, **kwargs)
 
@@ -159,7 +170,7 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
         cart = Cart(request.session)
         lines = get_cart_lines(cart)
         if not lines:
-            messages.info(request, 'Your cart is empty.')
+            messages.info(request, _('Your cart is empty.'))
             return redirect('catalog:home')
 
         form = CheckoutForm(request.POST)
@@ -181,7 +192,7 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
         send_order_confirmation(order)
         messages.success(
             request,
-            f'Order #{order.order_number} placed. A confirmation email is on its way.',
+            _('Order #%(number)s placed. A confirmation email is on its way.') % {'number': order.order_number},
         )
         return redirect('orders:order_detail', pk=order.pk)
 

@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from django.utils.translation import gettext as _
+
 from apps.catalog.selectors import can_submit_review
 from apps.reviews.models import Review
 
@@ -13,5 +15,5 @@ class ReviewNotAllowedError(ValueError):
 def create_review(*, user: Any, product: Any, rating: int, comment: str) -> Review:
     """Create a review only after the user bought the product and has not reviewed it yet."""
     if not can_submit_review(user, product):
-        raise ReviewNotAllowedError('You can only review a product after purchasing it.')
+        raise ReviewNotAllowedError(_('You can only review a product after purchasing it.'))
     return Review.objects.create(product=product, user=user, rating=rating, comment=comment)

@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
 from apps.catalog.models import Product
@@ -53,10 +54,13 @@ class ReviewCreateView(LoginRequiredMixin, FormView):
         except ReviewNotAllowedError:
             messages.error(
                 self.request,
-                'You can only review a product after purchasing it.',
+                _('You can only review a product after purchasing it.'),
             )
             return redirect(self.get_success_url())
-        messages.success(self.request, 'Thank you! Your review has been published.')
+        messages.success(
+            self.request,
+            _('Thank you! Your review has been published.'),
+        )
         return redirect(self.get_success_url())
 
     def get_success_url(self) -> str:

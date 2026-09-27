@@ -9,6 +9,7 @@ from typing import Any
 from django.db import transaction
 from django.db.models import DecimalField, F, Sum, Value
 from django.db.models.functions import Coalesce
+from django.utils.translation import gettext as _
 
 from apps.catalog.models import Product
 from apps.orders.cart import Cart
@@ -37,7 +38,14 @@ class OutOfStockError(ValueError):
         self.product_name = product_name
         self.requested = requested
         self.available = available
-        super().__init__(f'Only {available} of "{product_name}" are in stock ({requested} requested).')
+        super().__init__(
+            _('Only %(available)s of "%(product)s" are in stock (%(requested)s requested).')
+            % {
+                'available': available,
+                'product': product_name,
+                'requested': requested,
+            }
+        )
 
 
 class OrderTransitionError(ValueError):
@@ -47,7 +55,7 @@ class OrderTransitionError(ValueError):
 def cancel_order(order: Order) -> Order:
     """Cancel an order that has not been shipped yet; returns the updated order."""
     if order.status in (Order.Status.SHIPPED, Order.Status.DELIVERED, Order.Status.CANCELLED):
-        raise OrderTransitionError(f'Order #{order.order_number} cannot be cancelled.')
+        raise OrderTransitionError(_('Order #%(number)s cannot be cancelled.') % {'number': order.order_number})
     order.status = Order.Status.CANCELLED
     order.save(update_fields=['status', 'updated_at'])
     return order
