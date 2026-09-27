@@ -31,16 +31,22 @@ class ProductListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        category_slug = self.kwargs.get('category_slug')
+        self.category_slug = self._current_category_slug()
         ordering = self.request.GET.get('ordering', '-created_at')
-        queryset = get_product_listing(category_slug=category_slug, ordering=ordering)
+        queryset = get_product_listing(category_slug=self.category_slug, ordering=ordering)
         self.filterset = ProductFilter(self.request.GET, queryset=queryset)
         return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter'] = self.filterset
+        context['current_category_slug'] = self.category_slug
         return context
+
+    def _current_category_slug(self) -> str | None:
+        if 'category' in self.request.GET:
+            return self.request.GET.get('category') or None
+        return self.kwargs.get('category_slug')
 
 
 class ProductDetailView(DetailView):

@@ -82,6 +82,47 @@ def test_product_list_respects_ordering_and_category() -> None:
 
 
 @pytest.mark.django_db
+def test_category_url_preselects_active_category_in_filter() -> None:
+    malts = make_category('Malts', 'malts')
+    make_product('A Malt', malts)
+
+    response = Client().get('/category/malts/')
+
+    assert response.status_code == 200
+    assert response.context['current_category_slug'] == 'malts'
+    assert b'value="malts" selected' in response.content
+    assert b'action="/category/malts/"' in response.content
+
+
+@pytest.mark.django_db
+def test_category_get_param_overrides_category_url() -> None:
+    malts = make_category('Malts', 'malts')
+    hops = make_category('Hops', 'hops')
+    make_product('A Malt', malts)
+    b = make_product('B Hop', hops)
+
+    response = Client().get('/category/malts/?category=hops')
+
+    assert response.status_code == 200
+    assert list(response.context['products']) == [b]
+    assert response.context['current_category_slug'] == 'hops'
+
+
+@pytest.mark.django_db
+def test_empty_category_param_on_category_url_shows_all_products() -> None:
+    malts = make_category('Malts', 'malts')
+    hops = make_category('Hops', 'hops')
+    a = make_product('A Malt', malts)
+    b = make_product('B Hop', hops)
+
+    response = Client().get('/category/malts/?category=')
+
+    assert response.status_code == 200
+    assert set(response.context['products']) == {a, b}
+    assert response.context['current_category_slug'] is None
+
+
+@pytest.mark.django_db
 def test_product_list_filters_via_sidebar_params() -> None:
     malts = make_category('Malts', 'malts')
     make_product('Citra Hops', make_category('Hops', 'hops'))
