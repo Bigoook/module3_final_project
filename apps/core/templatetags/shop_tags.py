@@ -48,6 +48,12 @@ def shop_name() -> str:
     return settings.SHOP_NAME
 
 
+@register.simple_tag
+def shop_email() -> str:
+    """Return the shop contact email from settings, for templates rendered without a context."""
+    return settings.SHOP_EMAIL
+
+
 @register.simple_tag(takes_context=True)
 def language_url(context: Context, code: str) -> str:
     """Return the current page URL in the given language, query string preserved."""

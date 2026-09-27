@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: module3_final_project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-27 14:30+0300\n"
+"POT-Creation-Date: 2026-09-27 14:58+0300\n"
 "PO-Revision-Date: 2026-09-27 14:30+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -105,7 +105,8 @@ msgstr "Продукти"
 #: .\apps\core\management\commands\setup_roles.py:47
 msgid ""
 "Creates the admin role groups with their model permissions (idempotent)."
-msgstr "Створює групи ролей адміністратора разом із правами на моделі (ідемпотентно)."
+msgstr ""
+"Створює групи ролей адміністратора разом із правами на моделі (ідемпотентно)."
 
 #: .\apps\core\management\commands\setup_roles.py:53
 #, python-format
@@ -125,7 +126,6 @@ msgid "Enter a valid phone number (digits, +, -, spaces, parentheses)."
 msgstr "Введіть коректний номер телефону (цифри, +, -, пробіли, дужки)."
 
 #: .\apps\orders\forms.py:14
-#| msgid "quantity"
 msgid "Quantity"
 msgstr "Кількість"
 
@@ -139,7 +139,6 @@ msgid "Phone number"
 msgstr "Номер телефону"
 
 #: .\apps\orders\forms.py:23 .\templates\orders\checkout.html:30
-#| msgid "shipping address"
 msgid "Shipping address"
 msgstr "Адреса доставки"
 
@@ -208,7 +207,6 @@ msgid "payment method"
 msgstr "Спосіб оплати"
 
 #: .\apps\orders\models.py:68
-#| msgid "name"
 msgid "full name"
 msgstr "повне ім’я"
 
@@ -244,7 +242,9 @@ msgstr "позиції"
 #, python-format
 msgid ""
 "Only %(available)s of \"%(product)s\" are in stock (%(requested)s requested)."
-msgstr "У наявності лише %(available)s шт. «%(product)s» (замовлено %(requested)s шт.)."
+msgstr ""
+"У наявності лише %(available)s шт. «%(product)s» (замовлено %(requested)s "
+"шт.)."
 
 #: .\apps\orders\services.py:58
 #, python-format
@@ -327,6 +327,16 @@ msgstr "Ви можете залишити відгук лише після по
 msgid "Thank you! Your review has been published."
 msgstr "Дякуємо! Ваш відгук опубліковано."
 
+#: .\config\admin_site.py:15
+#, python-format
+msgid "%(shop)s Administration"
+msgstr "Адміністрування %(shop)s"
+
+#: .\config\admin_site.py:16
+#, python-format
+msgid "%(shop)s Admin"
+msgstr "Адмінка %(shop)s"
+
 #: .\config\admin_site.py:17
 msgid "Shop management"
 msgstr "Керування магазином"
@@ -359,7 +369,9 @@ msgstr "Щось пішло не так"
 msgid ""
 "Sorry, an unexpected error occurred on our end. Please try again in a few "
 "minutes."
-msgstr "Вибачте, на нашому боці сталася неочікувана помилка. Спробуйте ще раз за кілька хвилин."
+msgstr ""
+"Вибачте, на нашому боці сталася неочікувана помилка. Спробуйте ще раз за "
+"кілька хвилин."
 
 #: .\templates\500.html:34 .\templates\partials\footer.html:14
 msgid "All rights reserved"
@@ -375,7 +387,6 @@ msgid "Background pattern"
 msgstr "Фоновий патерн"
 
 #: .\templates\accounts\login.html:21 .\templates\accounts\register.html:21
-#| msgid "name"
 msgid "Username"
 msgstr "Ім’я користувача"
 
@@ -443,12 +454,10 @@ msgid "First name"
 msgstr "Ім’я"
 
 #: .\templates\accounts\profile.html:19
-#| msgid "name"
 msgid "Last name"
 msgstr "Прізвище"
 
 #: .\templates\accounts\profile.html:31
-#| msgid "shipping address"
 msgid "Default shipping address"
 msgstr "Адреса доставки за замовчуванням"
 
@@ -520,7 +529,6 @@ msgid "Total revenue"
 msgstr "Загальна виручка"
 
 #: .\templates\admin\shop_stats.html:37 .\templates\admin\shop_stats.html:111
-#| msgid "orders"
 msgid "Orders"
 msgstr "Замовлення"
 
@@ -529,7 +537,6 @@ msgid "Average check"
 msgstr "Середній чек"
 
 #: .\templates\admin\shop_stats.html:45
-#| msgid "orders"
 msgid "Pending orders"
 msgstr "Очікують замовлення"
 
@@ -538,7 +545,6 @@ msgid "Customers"
 msgstr "Покупці"
 
 #: .\templates\admin\shop_stats.html:53
-#| msgid "reviews"
 msgid "Reviews"
 msgstr "Відгуки"
 
@@ -552,9 +558,8 @@ msgid "Top-selling products"
 msgstr "Найбільш продавані продукти"
 
 #: .\templates\admin\shop_stats.html:64 .\templates\admin\shop_stats.html:88
-#: .\templates\emails\order_confirmation.html:15
+#: .\templates\emails\order_confirmation.html:14
 #: .\templates\orders\order_detail.html:19
-#| msgid "product"
 msgid "Product"
 msgstr "Продукт"
 
@@ -576,7 +581,6 @@ msgid "Low stock (≤ %(threshold)s)"
 msgstr "Малий залишок (≤ %(threshold)s)"
 
 #: .\templates\admin\shop_stats.html:89
-#| msgid "stock"
 msgid "Stock"
 msgstr "Залишок"
 
@@ -609,12 +613,10 @@ msgid "Beautiful hops on a dark background"
 msgstr "Гарні шишки на темному тлі"
 
 #: .\templates\catalog\home.html:16
-#| msgid "products"
 msgid "Featured products"
 msgstr "Рекомендовані продукти"
 
 #: .\templates\catalog\home.html:17 .\templates\catalog\home.html:31
-#| msgid "products"
 msgid "View all products"
 msgstr "Переглянути всі продукти"
 
@@ -650,12 +652,10 @@ msgid "Out of stock"
 msgstr "Немає в наявності"
 
 #: .\templates\catalog\product_detail.html:47 .\templates\orders\cart.html:37
-#| msgid "quantity"
 msgid "Decrease quantity"
 msgstr "Зменшити кількість"
 
 #: .\templates\catalog\product_detail.html:51 .\templates\orders\cart.html:39
-#| msgid "quantity"
 msgid "Increase quantity"
 msgstr "Збільшити кількість"
 
@@ -665,7 +665,6 @@ msgid "Add to Cart"
 msgstr "Додати в кошик"
 
 #: .\templates\catalog\product_detail.html:68
-#| msgid "reviews"
 msgid "Latest reviews"
 msgstr "Останні відгуки"
 
@@ -674,17 +673,14 @@ msgid "No reviews yet. Be the first to share your experience."
 msgstr "Відгуків ще немає. Будьте першим, хто поділиться враженням."
 
 #: .\templates\catalog\product_detail.html:94
-#| msgid "rating"
 msgid "Your rating"
 msgstr "Ваша оцінка"
 
 #: .\templates\catalog\product_detail.html:104
-#| msgid "comment"
 msgid "Comment"
 msgstr "Коментар"
 
 #: .\templates\catalog\product_detail.html:107
-#| msgid "review"
 msgid "Submit review"
 msgstr "Надіслати відгук"
 
@@ -703,19 +699,16 @@ msgid "Search"
 msgstr "Пошук"
 
 #: .\templates\catalog\product_list.html:22
-#| msgid "category"
 msgid "Category"
 msgstr "Категорія"
 
 #: .\templates\catalog\product_list.html:24
-#| msgid "categories"
 msgid "All categories"
 msgstr "Усі категорії"
 
 #: .\templates\catalog\product_list.html:35
-#: .\templates\emails\order_confirmation.html:17
+#: .\templates\emails\order_confirmation.html:16
 #: .\templates\orders\order_detail.html:20
-#| msgid "price"
 msgid "Price"
 msgstr "Ціна"
 
@@ -748,7 +741,6 @@ msgid "Price descending"
 msgstr "Ціна: за спаданням"
 
 #: .\templates\catalog\product_list.html:65
-#| msgid "rating"
 msgid "Rating"
 msgstr "Оцінка"
 
@@ -773,14 +765,19 @@ msgstr "Незабаром!"
 msgid ""
 "We are working hard to bring you the best guides and tested recipes from the "
 "world of homebrewing."
-msgstr "Ми докладаємо зусиль, щоб підготувати для вас найкращі гайди та перевірені рецепти з світу домашнього пивоваріння."
+msgstr ""
+"Ми докладаємо зусиль, щоб підготувати для вас найкращі гайди та перевірені "
+"рецепти з світу домашнього пивоваріння."
 
 #: .\templates\core\guides_recipes.html:14
 msgid ""
 "Here you will find everything from beginner's guides on your first brew to "
 "advanced techniques for experienced brewers, as well as a collection of "
 "recipes for various beer styles using our products."
-msgstr "Тут ви знайдете все: від гайдів для початківців про вашу першу партію до просунутих технік для досвідчених пивоварів, а також збірку рецептів різних сортів пива на нашій продукції."
+msgstr ""
+"Тут ви знайдете все: від гайдів для початківців про вашу першу партію до "
+"просунутих технік для досвідчених пивоварів, а також збірку рецептів різних "
+"сортів пива на нашій продукції."
 
 #: .\templates\core\guides_recipes.html:15
 msgid "Stay tuned for updates!"
@@ -790,45 +787,45 @@ msgstr "Стежте за оновленнями!"
 msgid "Back to Products"
 msgstr "Назад до продуктів"
 
-#: .\templates\emails\order_confirmation.html:6
+#: .\templates\emails\order_confirmation.html:5
 #, python-format
-msgid "%(shop_name)s — order #%(number)s"
-msgstr "%(shop_name)s — замовлення №%(number)s"
+msgid "order #%(number)s"
+msgstr "замовлення №%(number)s"
 
-#: .\templates\emails\order_confirmation.html:9
+#: .\templates\emails\order_confirmation.html:8
 #, python-format
 msgid "Thank you for your order, %(name)s!"
 msgstr "Дякуємо за ваше замовлення, %(name)s!"
 
-#: .\templates\emails\order_confirmation.html:10
+#: .\templates\emails\order_confirmation.html:9
 #, python-format
 msgid ""
 "Order #%(number)s · %(order.created_at|date:\"j M Y\")s · "
 "%(order.get_payment_method_display)s"
-msgstr "Замовлення №%(number)s · %(order.created_at|date:\"j M Y\")s · %(order.get_payment_method_display)s"
+msgstr ""
+"Замовлення №%(number)s · %(order.created_at|date:\"j M Y\")s · "
+"%(order.get_payment_method_display)s"
 
-#: .\templates\emails\order_confirmation.html:16
+#: .\templates\emails\order_confirmation.html:15
 #: .\templates\orders\order_detail.html:21
 msgid "Qty"
 msgstr "Кількість"
 
-#: .\templates\emails\order_confirmation.html:32
+#: .\templates\emails\order_confirmation.html:31
 #, python-format
-msgid "Total: %(total)s %(shop_currency)s"
-msgstr "Разом: %(total)s %(shop_currency)s"
+msgid "Total: %(total)s"
+msgstr "Разом: %(total)s"
 
-#: .\templates\emails\order_confirmation.html:36
+#: .\templates\emails\order_confirmation.html:35
 msgid "We will ship to:"
 msgstr "Ми доставимо за адресою:"
 
 #: .\templates\orders\cart.html:4 .\templates\orders\cart.html:9
 #: .\templates\partials\header.html:35 .\templates\partials\header.html:36
-#| msgid "shipping address"
 msgid "Shopping Cart"
 msgstr "Кошик"
 
 #: .\templates\orders\cart.html:14
-#| msgid "products"
 msgid "Browse products"
 msgstr "Переглянути продукти"
 
@@ -838,7 +835,6 @@ msgid "%(price)s each"
 msgstr "%(price)s за шт."
 
 #: .\templates\orders\cart.html:41
-#| msgid "updated at"
 msgid "Update"
 msgstr "Оновити"
 
@@ -873,7 +869,6 @@ msgid "Order Summary"
 msgstr "Підсумок замовлення"
 
 #: .\templates\orders\checkout.html:63
-#| msgid "order"
 msgid "Place order"
 msgstr "Оформити замовлення"
 
@@ -901,22 +896,18 @@ msgid "Cancel order"
 msgstr "Скасувати замовлення"
 
 #: .\templates\orders\order_detail.html:58
-#| msgid "orders"
 msgid "Back to orders"
 msgstr "Назад до замовлень"
 
 #: .\templates\orders\order_list.html:4
-#| msgid "orders"
 msgid "My Orders"
 msgstr "Мої замовлення"
 
 #: .\templates\orders\order_list.html:12
-#| msgid "status"
 msgid "Status"
 msgstr "Статус"
 
 #: .\templates\orders\order_list.html:14
-#| msgid "status"
 msgid "All statuses"
 msgstr "Усі статуси"
 
@@ -958,7 +949,6 @@ msgid "License"
 msgstr "Ліцензія"
 
 #: .\templates\partials\header.html:12
-#| msgid "products"
 msgid "Products"
 msgstr "Продукти"
 
@@ -972,7 +962,6 @@ msgstr "Нумерація сторінок"
 
 #: .\templates\partials\pagination.html:7
 #: .\templates\partials\pagination.html:12
-#| msgid "reviews"
 msgid "Previous"
 msgstr "Назад"
 
@@ -987,6 +976,5 @@ msgid "Next"
 msgstr "Далі"
 
 #: .\templates\partials\product_card.html:25
-#| msgid "stock"
 msgid "In stock"
 msgstr "В наявності"

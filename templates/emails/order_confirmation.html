@@ -1,9 +1,8 @@
-<!DOCTYPE html>
+{% load i18n shop_tags %}<!DOCTYPE html>
 <html>
-{% load i18n %}
 <head>
     <meta charset="utf-8">
-    <title>{% blocktranslate with number=order.order_number %}{{ shop_name }} — order #{{ number }}{% endblocktranslate %}</title>
+    <title>{% shop_name %} — {% blocktranslate with number=order.order_number %}order #{{ number }}{% endblocktranslate %}</title>
 </head>
 <body style="font-family: Inter, Arial, sans-serif; color: #1a1a1a; max-width: 600px; margin: 0 auto;">
     <h2 style="margin-bottom: 4px;">{% blocktranslate with name=order.full_name %}Thank you for your order, {{ name }}!{% endblocktranslate %}</h2>
@@ -22,14 +21,14 @@
             <tr>
                 <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{{ item.product.name }}</td>
                 <td style="padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: right;">{{ item.quantity }}</td>
-                <td style="padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: right;">{{ item.subtotal }} {{ shop_currency }}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: right;">{{ item.subtotal|money }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <p style="margin-top: 16px; font-size: 18px; font-weight: 700;">
-        {% blocktranslate with total=order.total_price %}Total: {{ total }} {{ shop_currency }}{% endblocktranslate %}
+        {% blocktranslate with total=order.total_price|money %}Total: {{ total }}{% endblocktranslate %}
     </p>
 
     <p style="color: #666; margin-top: 24px;">
@@ -37,7 +36,7 @@
         {{ order.shipping_address|linebreaksbr }}
     </p>
     <p style="color: #999; font-size: 12px; margin-top: 32px;">
-        {{ shop_name }} · {{ shop_email }}
+        {% shop_name %} · {% shop_email %}
     </p>
 </body>
 </html>

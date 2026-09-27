@@ -12,8 +12,8 @@ from apps.core.selectors import get_shop_statistics
 
 
 class ShopAdminSite(AdminSite):
-    site_header = f'{settings.SHOP_NAME} Administration'
-    site_title = f'{settings.SHOP_NAME} Admin'
+    site_header = _('%(shop)s Administration') % {'shop': settings.SHOP_NAME}
+    site_title = _('%(shop)s Admin') % {'shop': settings.SHOP_NAME}
     index_title = _('Shop management')
     index_template = 'admin/shop_index.html'
 
