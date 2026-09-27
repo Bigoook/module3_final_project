@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: module3_final_project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-27 14:58+0300\n"
+"POT-Creation-Date: 2026-09-27 15:34+0300\n"
 "PO-Revision-Date: 2026-09-27 14:30+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -13,18 +13,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-
-#: .\apps\accounts\admin.py:24
-msgid "Personal info"
-msgstr "Особиста інформація"
-
-#: .\apps\accounts\admin.py:28
-msgid "Permissions"
-msgstr "Права доступу"
-
-#: .\apps\accounts\admin.py:31
-msgid "Important dates"
-msgstr "Важливі дати"
 
 #: .\apps\accounts\forms.py:12 .\apps\orders\forms.py:21
 #: .\templates\accounts\profile.html:23 .\templates\accounts\register.html:25
@@ -327,24 +315,6 @@ msgstr "Ви можете залишити відгук лише після по
 msgid "Thank you! Your review has been published."
 msgstr "Дякуємо! Ваш відгук опубліковано."
 
-#: .\config\admin_site.py:15
-#, python-format
-msgid "%(shop)s Administration"
-msgstr "Адміністрування %(shop)s"
-
-#: .\config\admin_site.py:16
-#, python-format
-msgid "%(shop)s Admin"
-msgstr "Адмінка %(shop)s"
-
-#: .\config\admin_site.py:17
-msgid "Shop management"
-msgstr "Керування магазином"
-
-#: .\config\admin_site.py:34 .\templates\admin\shop_index.html:9
-msgid "Shop statistics"
-msgstr "Статистика магазину"
-
 #: .\templates\404.html:4 .\templates\404.html:11
 msgid "Page not found"
 msgstr "Сторінку не знайдено"
@@ -491,118 +461,6 @@ msgstr "Вже маєте обліковий запис?"
 #: .\templates\partials\header.html:32
 msgid "Sign in"
 msgstr "Увійти"
-
-#: .\templates\admin\api_token.html:6
-msgid "Freshly minted JWT tokens for"
-msgstr "Нові JWT-токени для"
-
-#: .\templates\admin\api_token.html:8
-msgid "Copy them now — the access token is shown only once here."
-msgstr "Скопіюйте їх зараз — токен доступу показується тут лише один раз."
-
-#: .\templates\admin\api_token.html:10
-msgid "Access token (valid for 30 minutes):"
-msgstr "Токен доступу (дійсний 30 хвилин):"
-
-#: .\templates\admin\api_token.html:12
-msgid "Refresh token (valid for 7 days):"
-msgstr "Токен оновлення (дійсний 7 днів):"
-
-#: .\templates\admin\api_token.html:15
-msgid "Use the access token as"
-msgstr "Використовуйте токен доступу як"
-
-#: .\templates\admin\api_token.html:17
-msgid "for the API. Refresh via"
-msgstr "для API. Оновлюйте через"
-
-#: .\templates\admin\api_token.html:19
-msgid "with the refresh token."
-msgstr "з токеном оновлення."
-
-#: .\templates\admin\shop_index.html:7
-msgid "Analytics"
-msgstr "Аналітика"
-
-#: .\templates\admin\shop_stats.html:33
-msgid "Total revenue"
-msgstr "Загальна виручка"
-
-#: .\templates\admin\shop_stats.html:37 .\templates\admin\shop_stats.html:111
-msgid "Orders"
-msgstr "Замовлення"
-
-#: .\templates\admin\shop_stats.html:41
-msgid "Average check"
-msgstr "Середній чек"
-
-#: .\templates\admin\shop_stats.html:45
-msgid "Pending orders"
-msgstr "Очікують замовлення"
-
-#: .\templates\admin\shop_stats.html:49
-msgid "Customers"
-msgstr "Покупці"
-
-#: .\templates\admin\shop_stats.html:53
-msgid "Reviews"
-msgstr "Відгуки"
-
-#: .\templates\admin\shop_stats.html:54
-#, python-format
-msgid "%(count)s (avg %(rating)s)"
-msgstr "%(count)s (сер. %(rating)s)"
-
-#: .\templates\admin\shop_stats.html:60
-msgid "Top-selling products"
-msgstr "Найбільш продавані продукти"
-
-#: .\templates\admin\shop_stats.html:64 .\templates\admin\shop_stats.html:88
-#: .\templates\emails\order_confirmation.html:14
-#: .\templates\orders\order_detail.html:19
-msgid "Product"
-msgstr "Продукт"
-
-#: .\templates\admin\shop_stats.html:65
-msgid "Sold"
-msgstr "Продано"
-
-#: .\templates\admin\shop_stats.html:66 .\templates\admin\shop_stats.html:112
-msgid "Revenue"
-msgstr "Виручка"
-
-#: .\templates\admin\shop_stats.html:77
-msgid "No sales yet."
-msgstr "Продажів ще немає."
-
-#: .\templates\admin\shop_stats.html:84
-#, python-format
-msgid "Low stock (≤ %(threshold)s)"
-msgstr "Малий залишок (≤ %(threshold)s)"
-
-#: .\templates\admin\shop_stats.html:89
-msgid "Stock"
-msgstr "Залишок"
-
-#: .\templates\admin\shop_stats.html:99
-msgid "No low-stock products."
-msgstr "Продуктів із малим залишком немає."
-
-#: .\templates\admin\shop_stats.html:106
-msgid "Orders — last 7 days"
-msgstr "Замовлення — останні 7 днів"
-
-#: .\templates\admin\shop_stats.html:110
-msgid "Day"
-msgstr "День"
-
-#: .\templates\admin\shop_stats.html:123
-msgid "No orders in the last 7 days."
-msgstr "Замовлень за останні 7 днів немає."
-
-#: .\templates\admin\shop_stats.html:130
-msgid "Back to admin"
-msgstr "Назад до адмінки"
 
 #: .\templates\catalog\home.html:4
 msgid "Home"
@@ -805,6 +663,11 @@ msgid ""
 msgstr ""
 "Замовлення №%(number)s · %(order.created_at|date:\"j M Y\")s · "
 "%(order.get_payment_method_display)s"
+
+#: .\templates\emails\order_confirmation.html:14
+#: .\templates\orders\order_detail.html:19
+msgid "Product"
+msgstr "Продукт"
 
 #: .\templates\emails\order_confirmation.html:15
 #: .\templates\orders\order_detail.html:21
