@@ -18,8 +18,8 @@
         </nav>
 
         <div class="header__lang-switch">
-            <a href="{% language_url 'en' %}" hreflang="en" lang="en" class="header__lang-switch-link{% if LANGUAGE_CODE == 'en' %} is-active{% endif %}">EN</a>
-            <a href="{% language_url 'uk' %}" hreflang="uk" lang="uk" class="header__lang-switch-link{% if LANGUAGE_CODE == 'uk' %} is-active{% endif %}">UA</a>
+            <a href="{% language_url 'en' %}" hreflang="en" lang="en" class="header__lang-switch-link{% if LANGUAGE_CODE == 'en' %} is-active{% endif %}"{% if LANGUAGE_CODE == 'en' %} aria-current="true"{% endif %}>EN</a>
+            <a href="{% language_url 'uk' %}" hreflang="uk" lang="uk" class="header__lang-switch-link{% if LANGUAGE_CODE == 'uk' %} is-active{% endif %}"{% if LANGUAGE_CODE == 'uk' %} aria-current="true"{% endif %}>UA</a>
         </div>
 
         <div class="header__user-actions">

@@ -64,14 +64,22 @@ def test_switcher_offers_both_languages_from_ukrainian_page(client: Client) -> N
 
     assert 'href="/products/?category=malts" hreflang="en"' in body
     assert 'href="/uk/products/?category=malts" hreflang="uk"' in body
-    assert 'hreflang="uk" lang="uk" class="header__lang-switch-link is-active"' in body
+    assert 'hreflang="uk" lang="uk" class="header__lang-switch-link is-active" aria-current="true"' in body
 
 
 def test_switcher_marks_english_active_on_english_page(client: Client) -> None:
     body = client.get('/products/').content.decode()
 
-    assert 'hreflang="en" lang="en" class="header__lang-switch-link is-active"' in body
+    assert 'hreflang="en" lang="en" class="header__lang-switch-link is-active" aria-current="true"' in body
     assert 'href="/uk/products/" hreflang="uk"' in body
+
+
+def test_switcher_marks_exactly_one_language_active(client: Client) -> None:
+    for path in ('/', f'{UK_PREFIX}/'):
+        body = client.get(path).content.decode()
+
+        assert body.count('is-active') == 1
+        assert body.count('aria-current="true"') == 1
 
 
 def test_switcher_drops_prefix_for_english_from_ukrainian_page(client: Client) -> None:
