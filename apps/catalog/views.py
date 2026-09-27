@@ -4,6 +4,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 from apps.catalog.filters import ProductFilter
 from apps.catalog.models import Product
 from apps.catalog.selectors import (
+    get_best_sellers,
     get_featured_products,
     get_product_detail_by_slug,
     get_product_listing,
@@ -19,6 +20,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['featured_products'] = get_featured_products()
+        context['best_sellers'] = get_best_sellers()
         return context
 
 

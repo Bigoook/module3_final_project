@@ -7,6 +7,7 @@ from django.db.models.deletion import ProtectedError
 from django.urls import reverse
 
 from apps.catalog.models import Category, Product
+from apps.orders.models import Order, OrderItem
 from apps.reviews.models import Review
 
 
@@ -236,3 +237,54 @@ def test_for_listing_defaults_ratings_to_zero() -> None:
     assert listed.rating_count == 0
     assert product.rating_avg == pytest.approx(0.0)
     assert product.rating_count == 0
+
+
+@pytest.mark.django_db
+def test_for_listing_annotates_sold_quantity_excluding_cancelled() -> None:
+    from django.contrib.auth import get_user_model
+
+    category = Category.objects.create(name='Shop', slug='shop')
+    alpha = Product.objects.create(
+        name='Alpha',
+        slug='alpha',
+        description='',
+        price=Decimal('9.99'),
+        category=category,
+    )
+    beta = Product.objects.create(
+        name='Beta',
+        slug='beta',
+        description='',
+        price=Decimal('7.99'),
+        category=category,
+    )
+    user = get_user_model().objects.create_user(username='buyer')
+
+    order = Order.objects.create(user=user, status=Order.Status.PAID)
+    OrderItem.objects.create(order=order, product=alpha, quantity=2, price=alpha.price)
+    OrderItem.objects.create(order=order, product=beta, quantity=1, price=beta.price)
+
+    cancelled = Order.objects.create(user=user, status=Order.Status.CANCELLED)
+    OrderItem.objects.create(order=cancelled, product=alpha, quantity=5, price=alpha.price)
+
+    listed = {product.pk: product for product in Product.objects.for_listing()}
+
+    assert listed[alpha.pk].sold_qty == 2
+    assert listed[beta.pk].sold_qty == 1
+
+
+@pytest.mark.django_db
+def test_for_listing_defaults_sold_quantity_to_zero() -> None:
+    category = Category.objects.create(name='Shop', slug='shop')
+    product = Product.objects.create(
+        name='Headphones',
+        slug='headphones',
+        description='',
+        price=Decimal('9.99'),
+        category=category,
+    )
+
+    listed = Product.objects.for_listing().get(pk=product.pk)
+
+    assert listed.sold_qty == 0
+    assert product.sold_qty == 0

@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from apps.catalog.filters import ProductFilter
 from apps.catalog.models import Category, Product
 from apps.catalog.selectors import (
+    get_best_sellers,
     get_featured_products,
     get_product_detail,
     get_product_detail_by_slug,
@@ -13,6 +14,7 @@ from apps.catalog.selectors import (
     get_related_products,
 )
 from apps.factories import make_product
+from apps.orders.models import Order, OrderItem
 from apps.reviews.models import Review
 
 
@@ -142,6 +144,58 @@ def test_listing_ignores_unknown_ordering() -> None:
     listed = list(get_product_listing(ordering='rating; DROP TABLE product'))
 
     assert set(listed) == set(products)
+
+
+@pytest.mark.django_db
+def test_listing_orders_by_sold_quantity() -> None:
+    user = get_user_model().objects.create_user(username='buyer')
+    alpha = make_product('Alpha')
+    beta = make_product('Beta')
+    gamma = make_product('Gamma')
+
+    order = Order.objects.create(user=user, status=Order.Status.PENDING)
+    OrderItem.objects.create(order=order, product=beta, quantity=3, price=beta.price)
+    OrderItem.objects.create(order=order, product=alpha, quantity=1, price=alpha.price)
+
+    listed = list(get_product_listing(ordering='-sold'))
+
+    assert [product.pk for product in listed] == [beta.pk, alpha.pk, gamma.pk]
+
+
+@pytest.mark.django_db
+def test_listing_ignores_cancelled_orders_when_sorting_by_sold() -> None:
+    user = get_user_model().objects.create_user(username='buyer')
+    alpha = make_product('Alpha')
+    beta = make_product('Beta')
+
+    cancelled = Order.objects.create(user=user, status=Order.Status.CANCELLED)
+    OrderItem.objects.create(order=cancelled, product=alpha, quantity=9, price=alpha.price)
+    order = Order.objects.create(user=user)
+    OrderItem.objects.create(order=order, product=beta, quantity=1, price=beta.price)
+
+    listed = list(get_product_listing(ordering='-sold'))
+
+    assert listed[0].pk == beta.pk
+
+
+@pytest.mark.django_db
+def test_best_sellers_orders_by_sold_quantity_and_limits() -> None:
+    user = get_user_model().objects.create_user(username='buyer')
+    alpha = make_product('Alpha')
+    beta = make_product('Beta')
+    gamma = make_product('Gamma')
+    delta = make_product('Delta')
+    epsilon = make_product('Epsilon')
+
+    order = Order.objects.create(user=user, status=Order.Status.DELIVERED)
+    OrderItem.objects.create(order=order, product=epsilon, quantity=5, price=epsilon.price)
+    OrderItem.objects.create(order=order, product=alpha, quantity=2, price=alpha.price)
+    OrderItem.objects.create(order=order, product=beta, quantity=2, price=beta.price)
+
+    best_sellers = list(get_best_sellers(limit=3))
+
+    assert [product.pk for product in best_sellers] == [epsilon.pk, beta.pk, alpha.pk]
+    assert len(best_sellers) == 3
 
 
 @pytest.mark.django_db

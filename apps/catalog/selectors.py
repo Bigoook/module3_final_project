@@ -15,6 +15,7 @@ ORDERING_CHOICES = {
     'price': 'price',
     '-price': '-price',
     '-rating': '-_rating_avg',
+    '-sold': '-_sold_qty',
     '-created_at': '-created_at',
 }
 
@@ -22,6 +23,11 @@ ORDERING_CHOICES = {
 def get_featured_products(limit: int = 6) -> QuerySet[Product]:
     """Active products with the highest average rating, newest first."""
     return Product.objects.for_listing().order_by('-_rating_avg', '-created_at')[:limit]  # type: ignore[misc]
+
+
+def get_best_sellers(limit: int = 6) -> QuerySet[Product]:
+    """Active products with the most sold quantities, newest first."""
+    return Product.objects.for_listing().order_by('-_sold_qty', '-created_at')[:limit]  # type: ignore[misc]
 
 
 def get_product_listing(

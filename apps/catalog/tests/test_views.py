@@ -22,6 +22,21 @@ def test_home_renders_featured_products() -> None:
 
 
 @pytest.mark.django_db
+def test_home_renders_best_sellers_section() -> None:
+    category = make_category()
+    product = make_product('Citra Hops', category)
+    user = get_user_model().objects.create_user(username='buyer')
+    order = Order.objects.create(user=user)
+    OrderItem.objects.create(order=order, product=product, quantity=2, price=product.price)
+
+    response = Client().get('/')
+
+    assert response.status_code == 200
+    assert b'Best sellers' in response.content
+    assert product.name.encode() in response.content
+
+
+@pytest.mark.django_db
 def test_home_header_lists_child_categories() -> None:
     parent = make_category('Malts', 'malts')
     Category.objects.create(name='Base Malts', slug='base-malts', parent=parent)
