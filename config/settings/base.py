@@ -131,6 +131,20 @@ REST_FRAMEWORK: dict[str, Any] = {
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # Rate limits, tunable per environment. Views opt into a stricter scope with
+    # `throttle_scope` (see apps/api/views.py); ScopedRateThrottle ignores views
+    # without a scope, so listing it here is safe.
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': env('DRF_THROTTLE_ANON', default='120/min'),
+        'user': env('DRF_THROTTLE_USER', default='600/min'),
+        'login': env('DRF_THROTTLE_LOGIN', default='10/min'),
+        'register': env('DRF_THROTTLE_REGISTER', default='20/hour'),
+    },
     'PAGE_SIZE': 12,
 }
 
