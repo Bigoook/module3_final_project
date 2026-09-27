@@ -170,3 +170,9 @@ class CartLineSerializer(serializers.Serializer):
 
     def get_product(self, line) -> dict:
         return ProductSerializer(line['product']).data
+
+
+class CartReadSerializer(serializers.Serializer):
+    lines = CartLineSerializer(many=True, read_only=True)
+    total = serializers.CharField(read_only=True)
+    is_empty = serializers.BooleanField(read_only=True)

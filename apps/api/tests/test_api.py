@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 import pytest
+from django.conf import settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -27,6 +28,30 @@ def _login(client: APIClient, username: str = 'alice') -> None:
     )
     assert response.status_code == 200
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {response.data["access"]}')
+
+
+@pytest.mark.django_db
+def test_schema_and_docs_are_available() -> None:
+    make_product(name='Pale malt', price='10.00', stock=5)
+
+    client = APIClient()
+
+    schema = client.get('/api/schema/')
+    assert schema.status_code == 200
+    assert schema.data['info']['title'] == f'{settings.SHOP_NAME} API'
+
+    paths = schema.data['paths']
+    assert '/api/products/' in paths
+    assert '/api/products/{id}/' in paths
+    assert '/api/cart/' in paths
+    assert '/api/orders/' in paths
+    assert '/api/users/register/' in paths
+    assert '/api/users/login/' in paths
+    assert '/api/productss/' not in paths
+
+    docs = client.get('/api/docs/')
+    assert docs.status_code == 200
+    assert 'swagger-ui' in docs.content.decode()
 
 
 @pytest.mark.django_db

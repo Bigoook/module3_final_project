@@ -1,6 +1,7 @@
 """REST API views. Querying goes through selectors, mutations through services."""
 
-from rest_framework import generics, status
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
+from rest_framework import generics, serializers, status
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -8,6 +9,7 @@ from rest_framework.views import APIView
 
 from apps.api.serializers import (
     CartLineSerializer,
+    CartReadSerializer,
     OrderSerializer,
     ProductDetailSerializer,
     ProductSerializer,
@@ -39,6 +41,12 @@ class ProductListView(generics.ListAPIView):
         return get_product_query(self.request.query_params)
 
 
+@extend_schema_view(
+    retrieve=extend_schema(
+        summary='Product detail',
+        description='Single product with reviews and related products.',
+    ),
+)
 class ProductDetailView(generics.RetrieveAPIView):
     """Single active product with its reviews and related products."""
 
@@ -65,10 +73,12 @@ class ReviewListCreateView(APIView):
             raise NotFound('Product not found.')
         return product
 
+    @extend_schema(summary='List reviews', responses={200: ReviewSerializer(many=True)})
     def get(self, request, pk: int):
         reviews = list_reviews(self._get_product(pk))
         return Response(ReviewSerializer(reviews, many=True).data)
 
+    @extend_schema(summary='Create a review', request=ReviewSerializer, responses={201: ReviewSerializer})
     def post(self, request, pk: int):
         product = self._get_product(pk)
         serializer = ReviewSerializer(data=request.data, context={'request': request, 'product': product})
@@ -77,6 +87,16 @@ class ReviewListCreateView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary='List own orders',
+        description='Orders of the authenticated user, newest first.',
+    ),
+    create=extend_schema(
+        summary='Create an order',
+        description='Checks out the session cart: snapshots prices, decrements stock and emails a confirmation.',
+    ),
+)
 class OrderListCreateView(generics.ListCreateAPIView):
     """The user's orders; creating an order checks out the session cart."""
 
@@ -87,6 +107,17 @@ class OrderListCreateView(generics.ListCreateAPIView):
         return get_user_orders(self.request.user)
 
 
+@extend_schema_view(
+    retrieve=extend_schema(summary='Order detail', description='One of the authenticated user\u2019s orders.'),
+    partial_update=extend_schema(
+        summary='Cancel an order',
+        description='PATCH with {"status": "cancelled"} owns the only allowed status change.',
+        responses={200: OrderSerializer},
+    ),
+    destroy=extend_schema(
+        summary='Cancel an order', description='DELETE cancels the order (soft delete).', responses={204: None}
+    ),
+)
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     """One of the user's orders; PATCH/DELETE cancel it via the service."""
 
@@ -124,6 +155,7 @@ class RegisterView(APIView):
 
     permission_classes = (AllowAny,)
 
+    @extend_schema(summary='Register a user', request=RegisterSerializer, responses={201: UserSerializer})
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -151,6 +183,7 @@ class CartView(APIView):
         except (TypeError, ValueError) as exc:
             raise ValidationError({'quantity': 'Quantity must be a whole number.'}) from exc
 
+    @extend_schema(summary='Read the cart', responses={200: CartReadSerializer})
     def get(self, request):
         cart = Cart(request.session)
         lines = get_cart_lines(cart)
@@ -162,20 +195,61 @@ class CartView(APIView):
             }
         )
 
+    @extend_schema(
+        summary='Add a product to the cart',
+        request=inline_serializer(
+            'CartAdd',
+            {
+                'product_id': serializers.IntegerField(),
+                'quantity': serializers.IntegerField(required=False, min_value=1, default=1),
+            },
+        ),
+        responses=inline_serializer(
+            'CartWriteResult',
+            {
+                'status': serializers.CharField(),
+                'quantity': serializers.IntegerField(),
+            },
+        ),
+    )
     def post(self, request):
         product = self._get_product(request.data.get('product_id'))
-        result = add_product_to_cart(Cart(request.session), product, self._quantity(request.data.get('quantity', 1)))
+        quantity = self._quantity(request.data.get('quantity', 1))
+        result = add_product_to_cart(Cart(request.session), product, quantity)
         if result.status == CartStatus.OUT_OF_STOCK:
             raise ValidationError({'detail': f'"{product.name}" is out of stock.'})
         return Response({'status': result.status.value, 'quantity': result.quantity}, status=status.HTTP_201_CREATED)
 
+    @extend_schema(
+        summary='Update a cart line quantity',
+        request=inline_serializer(
+            'CartUpdate',
+            {
+                'product_id': serializers.IntegerField(),
+                'quantity': serializers.IntegerField(min_value=1),
+            },
+        ),
+        responses=inline_serializer(
+            'CartWriteResult',
+            {
+                'status': serializers.CharField(),
+                'quantity': serializers.IntegerField(),
+            },
+        ),
+    )
     def patch(self, request):
         product = self._get_product(request.data.get('product_id'))
-        result = update_cart_quantity(Cart(request.session), product, self._quantity(request.data.get('quantity', 1)))
+        quantity = self._quantity(request.data.get('quantity', 1))
+        result = update_cart_quantity(Cart(request.session), product, quantity)
         if result.status == CartStatus.MISSING:
             raise NotFound('That product is not in your cart.')
         return Response({'status': result.status.value, 'quantity': result.quantity})
 
+    @extend_schema(
+        summary='Remove a product from the cart',
+        request=inline_serializer('CartRemove', {'product_id': serializers.IntegerField()}),
+        responses={204: None},
+    )
     def delete(self, request):
         product_id = request.data.get('product_id') or request.query_params.get('product_id')
         product = self._get_product(product_id)

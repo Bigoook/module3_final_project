@@ -25,6 +25,36 @@ def _add_to_group(user, group_name: str) -> None:
 
 
 @pytest.mark.django_db
+def test_issue_token_action_renders_jwt_for_selected_user(client) -> None:
+    user = User.objects.create_user(username='tokenuser', password='Secret-2026', is_staff=True, is_superuser=True)
+    client.force_login(user)
+
+    response = client.post(
+        _admin('accounts_user_changelist'),
+        {'action': 'issue_api_token', '_selected_action': [user.pk]},
+    )
+
+    assert response.status_code == 200
+    body = response.content.decode()
+    assert 'Freshly minted JWT tokens' in body
+    assert user.username in body
+
+
+@pytest.mark.django_db
+def test_issue_token_action_rejects_multiple_users(client) -> None:
+    first = User.objects.create_user(username='first', password='Secret-2026', is_staff=True, is_superuser=True)
+    second = User.objects.create_user(username='second', password='Secret-2026', is_staff=True, is_superuser=True)
+    client.force_login(first)
+
+    response = client.post(
+        _admin('accounts_user_changelist'),
+        {'action': 'issue_api_token', '_selected_action': [first.pk, second.pk]},
+    )
+
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
 def test_anonymous_admin_redirects_to_login(client) -> None:
     response = client.get(_admin('index'))
 
